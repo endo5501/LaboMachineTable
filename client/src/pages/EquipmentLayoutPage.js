@@ -18,6 +18,7 @@ function EquipmentLayoutPage() {
   const [textInputPosition, setTextInputPosition] = useState({ x: 0, y: 0 });
   const [textInputValue, setTextInputValue] = useState('');
   const [editingLabelId, setEditingLabelId] = useState(null);
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const layoutContainerRef = useRef(null);
 
   useEffect(() => {
@@ -103,6 +104,17 @@ function EquipmentLayoutPage() {
     if (!editMode) return;
     
     setDraggedEquipment(equipmentId);
+    
+    // Find the equipment's current position
+    const equipmentLayout = layout.find(item => item.equipment_id === equipmentId);
+    if (equipmentLayout) {
+      // Calculate offset between mouse position and equipment top-left corner
+      const rect = e.currentTarget.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
+      setDragOffset({ x: offsetX, y: offsetY });
+    }
+    
     // Set transparent drag image
     const img = new Image();
     img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -123,8 +135,10 @@ function EquipmentLayoutPage() {
     // Get drop position relative to layout container
     const container = layoutContainerRef.current;
     const rect = container.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    
+    // Apply the offset to get the correct position
+    const x = e.clientX - rect.left - dragOffset.x;
+    const y = e.clientY - rect.top - dragOffset.y;
     
     if (draggedEquipment) {
       // Update layout for the dragged equipment
@@ -135,6 +149,9 @@ function EquipmentLayoutPage() {
       updateTextLabelPosition(draggedLabel, x, y);
       setDraggedLabel(null);
     }
+    
+    // Reset drag offset
+    setDragOffset({ x: 0, y: 0 });
   };
 
   const updateEquipmentPosition = async (equipmentId, x, y) => {
@@ -191,6 +208,17 @@ function EquipmentLayoutPage() {
     if (!editMode) return;
     
     setDraggedLabel(labelId);
+    
+    // Find the label's current position
+    const label = textLabels.find(item => item.id === labelId);
+    if (label) {
+      // Calculate offset between mouse position and label top-left corner
+      const rect = e.currentTarget.getBoundingClientRect();
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
+      setDragOffset({ x: offsetX, y: offsetY });
+    }
+    
     // Set transparent drag image
     const img = new Image();
     img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
