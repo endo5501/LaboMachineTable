@@ -92,7 +92,8 @@ NcReserve addresses these challenges by providing a centralized, visual, and int
 - Equipment registration with details (name, type, specifications)
 - Equipment editing and deletion
 - Equipment status tracking (available, in use, under maintenance)
-- Visual equipment layout configuration
+- Visual equipment layout configuration with drag-and-drop functionality
+- Text label support for adding annotations to the layout
 
 ### Reservation System
 - Calendar-based reservation interface
@@ -101,11 +102,13 @@ NcReserve addresses these challenges by providing a centralized, visual, and int
 - Conflict prevention
 - Reservation confirmation and cancellation
 - Current usage status display
+- Date-based reservation view
 
 ### Visualization
 - Equipment layout display with real-time status
-- All-equipment reservation overview
+- All-equipment reservation overview with time slot grid
 - Individual equipment reservation details
+- Visual indication of current equipment usage
 
 ## Non-Functional Requirements
 

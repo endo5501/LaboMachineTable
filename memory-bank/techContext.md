@@ -22,7 +22,7 @@ NcReserve is built using a modern JavaScript stack with the following core techn
 
 ### Development Tools
 - **npm**: Package manager
-- **Webpack**: Module bundler
+- **webpack**: Module bundler
 - **Babel**: JavaScript compiler
 - **ESLint**: Code linting
 - **Jest**: Testing framework
@@ -114,7 +114,7 @@ npm run dev
 
 ### Development
 During development, the application runs with:
-- Frontend: Webpack dev server with hot reloading
+- Frontend: webpack dev server with hot reloading
 - Backend: Nodemon for automatic server restarts
 - Database: Local SQLite file
 
@@ -259,6 +259,19 @@ CREATE TABLE layout (
 );
 ```
 
+### Text Labels Table
+```sql
+CREATE TABLE text_labels (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  content TEXT NOT NULL,
+  x_position INTEGER NOT NULL,
+  y_position INTEGER NOT NULL,
+  font_size INTEGER DEFAULT 16,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
 ### Reservations Table
 ```sql
 CREATE TABLE reservations (
@@ -319,6 +332,20 @@ CREATE TABLE reservations (
 - `PUT /api/layout/equipment/:id`: Update equipment position
   - Request: `{ x_position, y_position, width, height }`
   - Response: `{ id, equipment_id, x_position, y_position, width, height }`
+- `DELETE /api/layout/equipment/:id`: Remove equipment from layout
+  - Response: `{ message: 'Layout deleted' }`
+- `GET /api/layout/labels`: Get all text labels
+  - Response: `[{ id, content, x_position, y_position, font_size }]`
+- `GET /api/layout/labels/:id`: Get text label by ID
+  - Response: `{ id, content, x_position, y_position, font_size }`
+- `POST /api/layout/labels`: Create a new text label
+  - Request: `{ content, x_position, y_position, font_size }`
+  - Response: `{ id, content, x_position, y_position, font_size }`
+- `PUT /api/layout/labels/:id`: Update a text label
+  - Request: `{ content, x_position, y_position, font_size }`
+  - Response: `{ id, content, x_position, y_position, font_size }`
+- `DELETE /api/layout/labels/:id`: Delete a text label
+  - Response: `{ message: 'Text label deleted' }`
 
 ### Reservations
 - `GET /api/reservations`: Get all reservations

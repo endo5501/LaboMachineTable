@@ -39,6 +39,15 @@ flowchart TD
     
     EquipLayout --> ReservWindow[Reservation Window]
     ReservStatus --> ReservWindow
+    
+    EquipLayout --> TextLabels[Text Labels]
+    EquipLayout --> DragDrop[Drag & Drop]
+    
+    ReservStatus --> TimeSlots[Time Slots]
+    ReservStatus --> Calendar[Calendar View]
+    
+    Auth --> AuthContext[Auth Context]
+    Auth --> PrivateRoute[Private Route]
 ```
 
 #### Core Components
@@ -51,9 +60,15 @@ flowchart TD
 1. **Login Screen**: User authentication interface
 2. **Equipment Management**: CRUD interface for equipment
 3. **User Management**: CRUD interface for users
-4. **Equipment Layout**: Visual representation of equipment placement
-5. **Reservation Status**: Overview of all equipment reservations
-6. **Reservation Window**: Detailed reservation interface for specific equipment
+4. **Equipment Layout**: Visual representation of equipment placement with drag-and-drop functionality
+5. **Reservation Status**: Overview of all equipment reservations with calendar view
+6. **Reservation Window**: Detailed reservation interface for specific equipment with time slot selection
+
+#### Feature Components
+1. **Text Labels**: Support for adding, editing, and positioning text labels in the equipment layout
+2. **Drag & Drop**: Interactive positioning of equipment and text labels in the layout
+3. **Time Slots**: 30-minute interval selection for equipment reservations
+4. **Calendar View**: Date-based view of equipment reservations
 
 ### Backend Components
 
@@ -85,7 +100,7 @@ flowchart TD
 1. **/api/auth**: Authentication endpoints
 2. **/api/users**: User management endpoints
 3. **/api/equipment**: Equipment management endpoints
-4. **/api/layout**: Equipment layout endpoints
+4. **/api/layout**: Equipment layout and text label endpoints
 5. **/api/reservations**: Reservation management endpoints
 
 #### Controllers
@@ -137,6 +152,25 @@ sequenceDiagram
     end
 ```
 
+### Equipment Layout Flow
+
+```mermaid
+sequenceDiagram
+    Client->>+Server: Get Equipment and Layout Data
+    Server->>+Database: Query Equipment
+    Database-->>-Server: Equipment Data
+    Server->>+Database: Query Layout
+    Database-->>-Server: Layout Data
+    Server->>+Database: Query Text Labels
+    Database-->>-Server: Text Labels Data
+    Server-->>-Client: Combined Layout Data
+    
+    Client->>Client: User Drags Equipment/Label
+    Client->>+Server: Update Position
+    Server->>Database: Save New Position
+    Server-->>-Client: Update Confirmation
+```
+
 ## State Management Approach
 
 ### Frontend State Management
@@ -144,7 +178,7 @@ The application uses React's Context API for global state management, with local
 
 1. **Authentication State**: Current user and login status
 2. **Equipment State**: List of equipment and their details
-3. **Layout State**: Equipment placement information
+3. **Layout State**: Equipment placement information and text labels
 4. **Reservation State**: Current reservations and availability
 
 ### Backend State Management
@@ -155,14 +189,22 @@ The server is stateless, with all state stored in the database. Session informat
 ### Frontend Patterns
 
 #### Component Patterns
-- **Container/Presentational Pattern**: Separating logic from presentation
+- **Container/Presentational Pattern**: Separating logic from presentation (e.g., ReservationWindow component)
 - **Compound Components**: Building complex UI elements from simpler components
 - **Render Props**: Sharing code between components
+- **Drag and Drop Pattern**: Interactive positioning of elements in the equipment layout
 
 #### State Management Patterns
-- **Context Provider Pattern**: Providing global state to component tree
+- **Context Provider Pattern**: Providing global state to component tree (e.g., AuthContext)
 - **Reducer Pattern**: Managing complex state transitions
 - **Custom Hooks**: Encapsulating and reusing stateful logic
+- **Controlled Components**: Form inputs with React state management
+
+#### UI Patterns
+- **Modal Dialog Pattern**: Reservation window implementation
+- **Time Slot Selection**: Visual representation of time intervals
+- **Calendar View**: Date-based data visualization
+- **Responsive Layout**: Adapting to different screen sizes
 
 ### Backend Patterns
 
@@ -170,11 +212,13 @@ The server is stateless, with all state stored in the database. Session informat
 - **MVC Pattern**: Separating concerns into Model, View, and Controller
 - **Repository Pattern**: Abstracting data access logic
 - **Service Layer Pattern**: Encapsulating business logic
+- **Middleware Pattern**: Processing requests through a chain of handlers
 
 #### API Patterns
 - **RESTful API**: Resource-based API design
-- **Middleware Pattern**: Processing requests through a chain of handlers
 - **Error Handler Pattern**: Centralizing error handling logic
+- **Authentication Middleware**: Protecting routes with JWT verification
+- **Validation Middleware**: Ensuring request data integrity
 
 ## API Structure
 
@@ -201,6 +245,12 @@ The server is stateless, with all state stored in the database. Session informat
 - `GET /api/layout`: Get equipment layout
 - `POST /api/layout`: Save equipment layout
 - `PUT /api/layout/equipment/:id`: Update equipment position
+- `DELETE /api/layout/equipment/:id`: Remove equipment from layout
+- `GET /api/layout/labels`: Get all text labels
+- `GET /api/layout/labels/:id`: Get text label by ID
+- `POST /api/layout/labels`: Create a new text label
+- `PUT /api/layout/labels/:id`: Update a text label
+- `DELETE /api/layout/labels/:id`: Delete a text label
 
 ### Reservation API
 - `GET /api/reservations`: List all reservations
@@ -245,6 +295,16 @@ erDiagram
         datetime updated_at
     }
     
+    TEXT_LABELS {
+        int id PK
+        string content
+        int x_position
+        int y_position
+        int font_size
+        datetime created_at
+        datetime updated_at
+    }
+    
     RESERVATIONS {
         int id PK
         int equipment_id FK
@@ -261,12 +321,28 @@ erDiagram
     EQUIPMENT ||--|| LAYOUT : positioned_as
 ```
 
+## Internationalization Approach
+
+```mermaid
+flowchart TD
+    Component[React Component] --> TranslateFunc[translate() Function]
+    TranslateFunc --> TranslationsObj[translations.js Object]
+    TranslationsObj --> EnglishText[English Text]
+    TranslationsObj --> JapaneseText[Japanese Text]
+    Component --> UI[User Interface]
+```
+
+The application implements internationalization using:
+1. **translations.js**: A central mapping of English text to Japanese translations
+2. **translate.js**: A utility function that looks up translations
+3. **Component Integration**: Components use the translate function for all user-facing text
+
 ## Security Considerations
 
 ### Authentication
 - Password hashing using bcrypt
-- Session-based authentication with secure cookies
-- CSRF protection
+- JWT-based authentication
+- Session management with secure tokens
 
 ### Data Validation
 - Input validation on all API endpoints
@@ -277,3 +353,8 @@ erDiagram
 - Role-based access control for administrative functions
 - Validation of user permissions for each operation
 - Protection of sensitive routes
+
+### Frontend Security
+- CSRF protection
+- Secure handling of authentication tokens
+- Input validation before submission
