@@ -71,7 +71,8 @@ nc-reserve/
 │
 ├── .gitignore              # Git ignore file
 ├── package.json            # Root package.json for scripts
-└── README.md               # Project documentation
+├── README.md               # Project documentation (English)
+└── README.ja.md            # Project documentation (Japanese)
 ```
 
 ### Installation and Setup
@@ -193,6 +194,10 @@ npm run build
 - **dotenv**: Environment variable management
 - **winston**: Logging library
 - **morgan**: HTTP request logger
+
+### Internationalization Dependencies
+- **translations.js**: Custom utility for storing English to Japanese text mappings
+- **translate.js**: Custom utility function for text translation
 
 ## Technical Constraints
 
@@ -387,3 +392,66 @@ CREATE TABLE reservations (
 - README files for setup and usage instructions
 - API documentation using Swagger/OpenAPI
 - Inline comments for complex logic
+- Dual-language documentation (README.md in English, README.ja.md in Japanese)
+
+## Internationalization Implementation
+
+### Approach
+The application implements internationalization to support both English and Japanese languages:
+
+1. **Translation Mapping**:
+   - A central `translations.js` file contains mappings from English text to Japanese translations
+   - Organized by functional areas (e.g., authentication, equipment, reservations)
+
+2. **Translation Utility**:
+   - The `translate.js` utility provides a function that looks up translations
+   - Default language is English, with Japanese translations applied when selected
+
+3. **Component Integration**:
+   - All user-facing text is wrapped in the translation function
+   - Components receive translated text based on the current language setting
+
+4. **Documentation**:
+   - Project documentation is provided in both English (README.md) and Japanese (README.ja.md)
+   - Documentation follows language-specific formatting conventions
+
+### Example Implementation
+```javascript
+// translations.js
+export const translations = {
+  common: {
+    submit: "送信",
+    cancel: "キャンセル",
+    save: "保存",
+    delete: "削除"
+  },
+  equipment: {
+    name: "装置名",
+    type: "種類",
+    description: "説明"
+  }
+};
+
+// translate.js
+export const translate = (text, language = 'en') => {
+  if (language === 'en') return text;
+  
+  // Navigate through the translations object to find the Japanese text
+  const sections = Object.keys(translations);
+  for (const section of sections) {
+    if (translations[section][text]) {
+      return translations[section][text];
+    }
+  }
+  
+  // Return original text if no translation found
+  return text;
+};
+
+// Component usage
+import { translate } from '../utils/translate';
+
+const SubmitButton = ({ language }) => {
+  return <button>{translate('submit', language)}</button>;
+};
+```

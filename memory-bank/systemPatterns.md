@@ -336,6 +336,7 @@ The application implements internationalization using:
 1. **translations.js**: A central mapping of English text to Japanese translations
 2. **translate.js**: A utility function that looks up translations
 3. **Component Integration**: Components use the translate function for all user-facing text
+4. **Documentation**: Dual-language documentation with README.md (English) and README.ja.md (Japanese)
 
 ## Security Considerations
 

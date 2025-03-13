@@ -133,6 +133,12 @@ NcReserve addresses these challenges by providing a centralized, visual, and int
 - Data protection for user and reservation information
 - Prevention of unauthorized reservation modifications
 
+### Internationalization
+- Support for both English and Japanese languages
+- Consistent translation across all user interfaces
+- Language-appropriate formatting for dates, times, and numbers
+- Dual-language documentation (README.md in English, README.ja.md in Japanese)
+
 ## User Experience Goals
 
 ### Simplicity

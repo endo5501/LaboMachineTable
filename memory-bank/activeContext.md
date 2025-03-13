@@ -25,6 +25,7 @@ The LaboMachineTable (NcReserve) project has progressed significantly in the imp
 - Implemented internationalization support with translations utility
 - Enhanced the login page functionality with proper error handling
 - Improved the equipment management interface
+- Created Japanese version of README.md (README.ja.md) to support internationalization efforts
 
 ## Next Steps
 

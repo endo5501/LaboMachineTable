@@ -44,6 +44,7 @@ The LaboMachineTable (NcReserve) project has progressed significantly in the imp
 - ✅ Time slot selection system
 - ✅ Reservation conflict detection
 - ✅ Internationalization infrastructure with translation utility
+- ✅ Japanese version of README.md (README.ja.md) created
 
 ## Features In Progress
 
