@@ -1,6 +1,6 @@
-# NcReserve - Laboratory Equipment Reservation System
+# LaboMachineTable - Laboratory Equipment Reservation System
 
-NcReserve is a web application designed to manage and streamline the reservation process for laboratory equipment. The system allows users to view equipment availability, make reservations, and manage equipment and user data.
+LaboMachineTable is a web application designed to manage and streamline the reservation process for laboratory equipment. The system allows users to view equipment availability, make reservations, and manage equipment and user data.
 
 ## Features
 
