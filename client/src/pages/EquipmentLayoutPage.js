@@ -305,6 +305,16 @@ function EquipmentLayoutPage() {
     }
   };
 
+  const removeEquipmentFromLayout = async (equipmentId) => {
+    try {
+      await axios.delete(`/api/layout/equipment/${equipmentId}`);
+      fetchData();
+    } catch (err) {
+      console.error('Error removing equipment from layout:', err);
+      setError('Failed to remove equipment from layout. Please try again.');
+    }
+  };
+
   const saveLayout = async () => {
     try {
       await axios.post('/api/layout', layout);
@@ -420,6 +430,19 @@ function EquipmentLayoutPage() {
                 <div className="equipment-name">{item.name}</div>
                 {item.current_user && (
                   <div className="user-name">{translate('In use by:')} {item.current_user}</div>
+                )}
+                {editMode && (
+                  <div className="equipment-controls" style={{ marginTop: '4px', display: 'flex', justifyContent: 'center' }}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeEquipmentFromLayout(item.id);
+                      }}
+                      style={{ fontSize: '12px', padding: '2px 4px', backgroundColor: '#dc3545', color: 'white' }}
+                    >
+                      {translate('Remove Equipment')}
+                    </button>
+                  </div>
                 )}
               </div>
             ))}

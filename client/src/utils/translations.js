@@ -44,6 +44,7 @@ const translations = {
   'Add Text': 'テキストを追加',
   'Edit Text': 'テキストを編集',
   'Delete Text': 'テキストを削除',
+  'Remove Equipment': '装置を削除',
   'Enter text:': 'テキストを入力:',
   'Double-click to add text': 'ダブルクリックでテキストを追加',
   
