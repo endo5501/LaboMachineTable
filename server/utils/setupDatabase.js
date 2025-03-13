@@ -76,6 +76,19 @@ db.serialize(() => {
     )
   `);
 
+  // Text Labels table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS text_labels (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      content TEXT NOT NULL,
+      x_position INTEGER NOT NULL,
+      y_position INTEGER NOT NULL,
+      font_size INTEGER DEFAULT 16,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   console.log('Database setup completed');
 });
 

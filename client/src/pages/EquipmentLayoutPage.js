@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import ReservationWindow from '../components/ReservationWindow';
 import translate from '../utils/translate';
@@ -6,12 +6,19 @@ import translate from '../utils/translate';
 function EquipmentLayoutPage() {
   const [equipment, setEquipment] = useState([]);
   const [layout, setLayout] = useState([]);
+  const [textLabels, setTextLabels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [showReservationWindow, setShowReservationWindow] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [draggedEquipment, setDraggedEquipment] = useState(null);
+  const [draggedLabel, setDraggedLabel] = useState(null);
+  const [showTextInput, setShowTextInput] = useState(false);
+  const [textInputPosition, setTextInputPosition] = useState({ x: 0, y: 0 });
+  const [textInputValue, setTextInputValue] = useState('');
+  const [editingLabelId, setEditingLabelId] = useState(null);
+  const layoutContainerRef = useRef(null);
 
   useEffect(() => {
     fetchData();
@@ -21,12 +28,13 @@ function EquipmentLayoutPage() {
     try {
       setLoading(true);
       
-      // Fetch equipment, layout, reservation, and user data in parallel
-      const [equipmentResponse, layoutResponse, reservationsResponse, usersResponse] = await Promise.all([
+      // Fetch equipment, layout, reservation, user data, and text labels in parallel
+      const [equipmentResponse, layoutResponse, reservationsResponse, usersResponse, textLabelsResponse] = await Promise.all([
         axios.get('/api/equipment'),
         axios.get('/api/layout'),
         axios.get('/api/reservations'),
-        axios.get('/api/users')
+        axios.get('/api/users'),
+        axios.get('/api/layout/labels')
       ]);
       
       // Get current date and time
@@ -65,6 +73,7 @@ function EquipmentLayoutPage() {
       
       setEquipment(equipmentWithUsers);
       setLayout(layoutResponse.data);
+      setTextLabels(textLabelsResponse.data);
       setError('');
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -101,25 +110,31 @@ function EquipmentLayoutPage() {
   };
 
   const handleDragOver = (e) => {
-    if (!editMode || !draggedEquipment) return;
+    if (!editMode || (!draggedEquipment && !draggedLabel)) return;
     
     e.preventDefault();
   };
 
   const handleDrop = (e) => {
-    if (!editMode || !draggedEquipment) return;
+    if (!editMode) return;
     
     e.preventDefault();
     
     // Get drop position relative to layout container
-    const container = document.querySelector('.layout-container');
+    const container = layoutContainerRef.current;
     const rect = container.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     
-    // Update layout for the dragged equipment
-    updateEquipmentPosition(draggedEquipment, x, y);
-    setDraggedEquipment(null);
+    if (draggedEquipment) {
+      // Update layout for the dragged equipment
+      updateEquipmentPosition(draggedEquipment, x, y);
+      setDraggedEquipment(null);
+    } else if (draggedLabel) {
+      // Update position for the dragged text label
+      updateTextLabelPosition(draggedLabel, x, y);
+      setDraggedLabel(null);
+    }
   };
 
   const updateEquipmentPosition = async (equipmentId, x, y) => {
@@ -154,6 +169,111 @@ function EquipmentLayoutPage() {
     } catch (err) {
       console.error('Error updating equipment position:', err);
       setError('Failed to update equipment position. Please try again.');
+    }
+  };
+
+  const updateTextLabelPosition = async (labelId, x, y) => {
+    try {
+      await axios.put(`/api/layout/labels/${labelId}`, {
+        x_position: Math.max(0, x),
+        y_position: Math.max(0, y)
+      });
+      
+      // Refresh data
+      fetchData();
+    } catch (err) {
+      console.error('Error updating text label position:', err);
+      setError('Failed to update text label position. Please try again.');
+    }
+  };
+
+  const handleTextLabelDragStart = (e, labelId) => {
+    if (!editMode) return;
+    
+    setDraggedLabel(labelId);
+    // Set transparent drag image
+    const img = new Image();
+    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    e.dataTransfer.setDragImage(img, 0, 0);
+  };
+
+  const handleLayoutDoubleClick = (e) => {
+    if (!editMode) return;
+    
+    // Prevent double click from being triggered on equipment or text labels
+    if (e.target !== layoutContainerRef.current) return;
+    
+    // Get click position relative to layout container
+    const rect = layoutContainerRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    // Show text input at this position
+    setTextInputPosition({ x, y });
+    setTextInputValue('');
+    setEditingLabelId(null);
+    setShowTextInput(true);
+  };
+
+  const handleTextLabelClick = (e, label) => {
+    if (!editMode) return;
+    
+    e.stopPropagation();
+    
+    // Show text input at this position
+    setTextInputPosition({ x: label.x_position, y: label.y_position });
+    setTextInputValue(label.content);
+    setEditingLabelId(label.id);
+    setShowTextInput(true);
+  };
+
+  const handleTextInputSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!textInputValue.trim()) {
+      setShowTextInput(false);
+      return;
+    }
+    
+    try {
+      if (editingLabelId) {
+        // Update existing label
+        await axios.put(`/api/layout/labels/${editingLabelId}`, {
+          content: textInputValue
+        });
+      } else {
+        // Create new label
+        await axios.post('/api/layout/labels', {
+          content: textInputValue,
+          x_position: textInputPosition.x,
+          y_position: textInputPosition.y
+        });
+      }
+      
+      // Reset state and refresh data
+      setShowTextInput(false);
+      setTextInputValue('');
+      setEditingLabelId(null);
+      fetchData();
+    } catch (err) {
+      console.error('Error saving text label:', err);
+      setError('Failed to save text label. Please try again.');
+    }
+  };
+
+  const handleTextInputCancel = () => {
+    setShowTextInput(false);
+    setTextInputValue('');
+    setEditingLabelId(null);
+  };
+
+  const deleteTextLabel = async (labelId) => {
+    try {
+      await axios.delete(`/api/layout/labels/${labelId}`);
+      fetchData();
+    } catch (err) {
+      console.error('Error deleting text label:', err);
+      setError('Failed to delete text label. Please try again.');
     }
   };
 
@@ -217,12 +337,17 @@ function EquipmentLayoutPage() {
             </button>
             
             {editMode && (
-              <button 
-                onClick={saveLayout}
-                style={{ backgroundColor: '#28a745' }}
-              >
-                {translate('Save Layout')}
-              </button>
+              <>
+                <button 
+                  onClick={saveLayout}
+                  style={{ backgroundColor: '#28a745', marginRight: '10px' }}
+                >
+                  {translate('Save Layout')}
+                </button>
+                <span style={{ fontSize: '14px', color: '#6c757d' }}>
+                  {translate('Double-click to add text')}
+                </span>
+              </>
             )}
           </div>
         </div>
@@ -243,11 +368,14 @@ function EquipmentLayoutPage() {
           <p>Loading equipment layout...</p>
         ) : (
           <div 
+            ref={layoutContainerRef}
             className="layout-container"
             onDragOver={handleDragOver}
             onDrop={handleDrop}
+            onDoubleClick={handleLayoutDoubleClick}
             style={{ position: 'relative', minHeight: '600px' }}
           >
+            {/* Equipment items */}
             {positionedEquipment.map(item => (
               <div
                 key={item.id}
@@ -267,6 +395,101 @@ function EquipmentLayoutPage() {
                 )}
               </div>
             ))}
+            
+            {/* Text labels */}
+            {textLabels.map(label => (
+              <div
+                key={label.id}
+                className="text-label"
+                style={{
+                  position: 'absolute',
+                  left: `${label.x_position}px`,
+                  top: `${label.y_position}px`,
+                  fontSize: `${label.font_size}px`,
+                  cursor: editMode ? 'move' : 'default',
+                  backgroundColor: editMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                  padding: editMode ? '4px' : '0',
+                  borderRadius: '4px',
+                  userSelect: 'none'
+                }}
+                onClick={(e) => handleTextLabelClick(e, label)}
+                draggable={editMode}
+                onDragStart={(e) => handleTextLabelDragStart(e, label.id)}
+              >
+                {label.content}
+                {editMode && (
+                  <div className="text-label-controls" style={{ marginTop: '4px', display: 'flex', gap: '4px' }}>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleTextLabelClick(e, label);
+                      }}
+                      style={{ fontSize: '12px', padding: '2px 4px' }}
+                    >
+                      {translate('Edit Text')}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteTextLabel(label.id);
+                      }}
+                      style={{ fontSize: '12px', padding: '2px 4px', backgroundColor: '#dc3545', color: 'white' }}
+                    >
+                      {translate('Delete Text')}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {/* Text input dialog */}
+            {showTextInput && (
+              <div
+                className="text-input-dialog"
+                style={{
+                  position: 'absolute',
+                  left: `${textInputPosition.x}px`,
+                  top: `${textInputPosition.y}px`,
+                  backgroundColor: 'white',
+                  padding: '10px',
+                  borderRadius: '4px',
+                  boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+                  zIndex: 100
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <form onSubmit={handleTextInputSubmit}>
+                  <div style={{ marginBottom: '10px' }}>
+                    <label htmlFor="textInput" style={{ display: 'block', marginBottom: '5px' }}>
+                      {translate('Enter text:')}
+                    </label>
+                    <input
+                      id="textInput"
+                      type="text"
+                      value={textInputValue}
+                      onChange={(e) => setTextInputValue(e.target.value)}
+                      autoFocus
+                      style={{ width: '100%', padding: '5px' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '5px' }}>
+                    <button
+                      type="button"
+                      onClick={handleTextInputCancel}
+                      style={{ padding: '5px 10px' }}
+                    >
+                      {translate('Cancel')}
+                    </button>
+                    <button
+                      type="submit"
+                      style={{ padding: '5px 10px', backgroundColor: '#28a745', color: 'white' }}
+                    >
+                      {translate('Save')}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
             
             {editMode && unpositionedEquipment.length > 0 && (
               <div className="card" style={{ marginTop: '20px' }}>

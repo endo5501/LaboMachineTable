@@ -41,6 +41,11 @@ const translations = {
   'Save Layout': 'レイアウトを保存',
   'Cancel': 'キャンセル',
   'In use by:': '使用者:',
+  'Add Text': 'テキストを追加',
+  'Edit Text': 'テキストを編集',
+  'Delete Text': 'テキストを削除',
+  'Enter text:': 'テキストを入力:',
+  'Double-click to add text': 'ダブルクリックでテキストを追加',
   
   // Reservation Status Page
   'Reservation Status': '予約状況',

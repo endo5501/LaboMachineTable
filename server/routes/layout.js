@@ -257,4 +257,171 @@ router.delete('/equipment/:id', async (req, res) => {
   }
 });
 
+/**
+ * @route   GET /api/layout/labels
+ * @desc    Get all text labels
+ * @access  Private
+ */
+router.get('/labels', async (req, res) => {
+  try {
+    const labels = await all('SELECT * FROM text_labels');
+    res.json(labels);
+  } catch (err) {
+    console.error('Get text labels error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   GET /api/layout/labels/:id
+ * @desc    Get text label by ID
+ * @access  Private
+ */
+router.get('/labels/:id', async (req, res) => {
+  try {
+    const label = await get(
+      'SELECT * FROM text_labels WHERE id = ?',
+      [req.params.id]
+    );
+    
+    if (!label) {
+      return res.status(404).json({ message: 'Text label not found' });
+    }
+    
+    res.json(label);
+  } catch (err) {
+    console.error('Get text label error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   POST /api/layout/labels
+ * @desc    Create a new text label
+ * @access  Private
+ */
+router.post('/labels', async (req, res) => {
+  try {
+    const { content, x_position, y_position, font_size } = req.body;
+    
+    if (!content || x_position === undefined || y_position === undefined) {
+      return res.status(400).json({ 
+        message: 'Content, x_position, and y_position are required' 
+      });
+    }
+    
+    const result = await run(
+      `INSERT INTO text_labels 
+        (content, x_position, y_position, font_size) 
+      VALUES (?, ?, ?, ?)`,
+      [
+        content, 
+        x_position, 
+        y_position, 
+        font_size || 16
+      ]
+    );
+    
+    const newLabel = await get(
+      'SELECT * FROM text_labels WHERE id = ?',
+      [result.id]
+    );
+    
+    res.status(201).json(newLabel);
+  } catch (err) {
+    console.error('Create text label error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   PUT /api/layout/labels/:id
+ * @desc    Update a text label
+ * @access  Private
+ */
+router.put('/labels/:id', async (req, res) => {
+  try {
+    const { content, x_position, y_position, font_size } = req.body;
+    const id = req.params.id;
+    
+    // Check if label exists
+    const label = await get('SELECT id FROM text_labels WHERE id = ?', [id]);
+    
+    if (!label) {
+      return res.status(404).json({ message: 'Text label not found' });
+    }
+    
+    // Build update query based on provided fields
+    let updateFields = [];
+    let updateValues = [];
+    
+    if (content !== undefined) {
+      updateFields.push('content = ?');
+      updateValues.push(content);
+    }
+    
+    if (x_position !== undefined) {
+      updateFields.push('x_position = ?');
+      updateValues.push(x_position);
+    }
+    
+    if (y_position !== undefined) {
+      updateFields.push('y_position = ?');
+      updateValues.push(y_position);
+    }
+    
+    if (font_size !== undefined) {
+      updateFields.push('font_size = ?');
+      updateValues.push(font_size);
+    }
+    
+    updateFields.push('updated_at = CURRENT_TIMESTAMP');
+    
+    // Add ID to values array
+    updateValues.push(id);
+    
+    // Update label
+    await run(
+      `UPDATE text_labels SET ${updateFields.join(', ')} WHERE id = ?`,
+      updateValues
+    );
+    
+    const updatedLabel = await get(
+      'SELECT * FROM text_labels WHERE id = ?',
+      [id]
+    );
+    
+    res.json(updatedLabel);
+  } catch (err) {
+    console.error('Update text label error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   DELETE /api/layout/labels/:id
+ * @desc    Delete a text label
+ * @access  Private
+ */
+router.delete('/labels/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    
+    // Check if label exists
+    const label = await get('SELECT id FROM text_labels WHERE id = ?', [id]);
+    
+    if (!label) {
+      return res.status(404).json({ message: 'Text label not found' });
+    }
+    
+    // Delete label
+    await run('DELETE FROM text_labels WHERE id = ?', [id]);
+    
+    res.json({ message: 'Text label deleted' });
+  } catch (err) {
+    console.error('Delete text label error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
