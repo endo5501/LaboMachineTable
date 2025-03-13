@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import translate from '../utils/translate';
 
 function LoginPage() {
   const [username, setUsername] = useState('');
@@ -17,7 +18,7 @@ function LoginPage() {
     e.preventDefault();
     
     if (!username || !password) {
-      setError('Username and password are required');
+      setError(translate('Username and password are required'));
       return;
     }
     
@@ -33,7 +34,7 @@ function LoginPage() {
 
   return (
     <div className="auth-container">
-      <h2 className="auth-title">Login to NcReserve</h2>
+      <h2 className="auth-title">{translate('Login to NcReserve')}</h2>
       
       {error && (
         <div className="alert" style={{ 
@@ -49,7 +50,7 @@ function LoginPage() {
       
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">{translate('Username')}</label>
           <input
             type="text"
             id="username"
@@ -60,7 +61,7 @@ function LoginPage() {
         </div>
         
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{translate('Password')}</label>
           <input
             type="password"
             id="password"
@@ -75,12 +76,12 @@ function LoginPage() {
           className="auth-button" 
           disabled={loading}
         >
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? translate('Logging in...') : translate('Login')}
         </button>
       </form>
       
       <p className="mt-3 text-center">
-        New users will be automatically registered upon first login.
+        {translate('New users will be automatically registered upon first login.')}
       </p>
     </div>
   );

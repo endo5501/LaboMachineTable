@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import translate from '../utils/translate';
 
 function EquipmentManagementPage() {
   const [equipment, setEquipment] = useState([]);
@@ -24,7 +25,7 @@ function EquipmentManagementPage() {
       setError('');
     } catch (err) {
       console.error('Error fetching equipment:', err);
-      setError('Failed to load equipment. Please try again later.');
+      setError(translate('Failed to load equipment. Please try again later.'));
     } finally {
       setLoading(false);
     }
@@ -54,7 +55,7 @@ function EquipmentManagementPage() {
       fetchEquipment();
     } catch (err) {
       console.error('Error saving equipment:', err);
-      setError('Failed to save equipment. Please try again.');
+      setError(translate('Failed to save equipment. Please try again.'));
     }
   };
 
@@ -68,7 +69,7 @@ function EquipmentManagementPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this equipment?')) {
+    if (!window.confirm(translate('Are you sure you want to delete this equipment?'))) {
       return;
     }
     
@@ -77,7 +78,7 @@ function EquipmentManagementPage() {
       fetchEquipment();
     } catch (err) {
       console.error('Error deleting equipment:', err);
-      setError('Failed to delete equipment. Please try again.');
+      setError(translate('Failed to delete equipment. Please try again.'));
     }
   };
 
@@ -90,7 +91,7 @@ function EquipmentManagementPage() {
     <div className="container">
       <div className="card">
         <div className="card-header">
-          <h2 className="card-title">Equipment Management</h2>
+          <h2 className="card-title">{translate('Equipment Management')}</h2>
         </div>
         
         {error && (
@@ -107,7 +108,7 @@ function EquipmentManagementPage() {
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name">Equipment Name</label>
+            <label htmlFor="name">{translate('Equipment Name')}</label>
             <input
               type="text"
               id="name"
@@ -119,7 +120,7 @@ function EquipmentManagementPage() {
           </div>
           
           <div className="form-group">
-            <label htmlFor="type">Type</label>
+            <label htmlFor="type">{translate('Type')}</label>
             <input
               type="text"
               id="type"
@@ -130,7 +131,7 @@ function EquipmentManagementPage() {
           </div>
           
           <div className="form-group">
-            <label htmlFor="description">Description</label>
+            <label htmlFor="description">{translate('Description')}</label>
             <textarea
               id="description"
               name="description"
@@ -142,7 +143,7 @@ function EquipmentManagementPage() {
           
           <div style={{ display: 'flex', gap: '10px' }}>
             <button type="submit">
-              {editingId ? 'Update Equipment' : 'Add Equipment'}
+              {editingId ? translate('Update Equipment') : translate('Add Equipment')}
             </button>
             
             {editingId && (
@@ -151,7 +152,7 @@ function EquipmentManagementPage() {
                 onClick={handleCancel}
                 style={{ backgroundColor: '#6c757d' }}
               >
-                Cancel
+                {translate('Cancel')}
               </button>
             )}
           </div>
@@ -160,27 +161,27 @@ function EquipmentManagementPage() {
       
       <div className="card">
         <div className="card-header">
-          <h3 className="card-title">Equipment List</h3>
+          <h3 className="card-title">{translate('Equipment List')}</h3>
         </div>
         
         {loading ? (
-          <p>Loading equipment...</p>
+          <p>{translate('Loading...')}</p>
         ) : (
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Description</th>
-                  <th>Actions</th>
+                  <th>{translate('Name')}</th>
+                  <th>{translate('Type')}</th>
+                  <th>{translate('Description')}</th>
+                  <th>{translate('Actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {equipment.length === 0 ? (
                   <tr>
                     <td colSpan="4" style={{ textAlign: 'center' }}>
-                      No equipment found. Add some equipment above.
+                      {translate('No data available')}
                     </td>
                   </tr>
                 ) : (
@@ -198,7 +199,7 @@ function EquipmentManagementPage() {
                               padding: '0.25rem 0.5rem'
                             }}
                           >
-                            Edit
+                            {translate('Edit')}
                           </button>
                           <button 
                             onClick={() => handleDelete(item.id)}
@@ -207,7 +208,7 @@ function EquipmentManagementPage() {
                               padding: '0.25rem 0.5rem'
                             }}
                           >
-                            Delete
+                            {translate('Delete')}
                           </button>
                         </div>
                       </td>

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import translate from '../utils/translate';
 
 const AuthContext = createContext();
 
@@ -48,7 +49,7 @@ export function AuthProvider({ children }) {
       return user;
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.response?.data?.message || 'Failed to login');
+      setError(translate(err.response?.data?.message || 'Failed to login'));
       throw err;
     }
   };

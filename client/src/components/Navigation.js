@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import translate from '../utils/translate';
 
 function Navigation() {
   const { currentUser, logout } = useAuth();
@@ -16,26 +17,26 @@ function Navigation() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar-brand">NcReserve</Link>
+      <Link to="/" className="navbar-brand">{translate('NcReserve')}</Link>
       <ul className="navbar-nav">
         <li className="nav-item">
           <Link to="/layout" className={`nav-link ${isActive('/layout')}`}>
-            Equipment Layout
+            {translate('Equipment Layout')}
           </Link>
         </li>
         <li className="nav-item">
           <Link to="/reservations" className={`nav-link ${isActive('/reservations')}`}>
-            Reservations
+            {translate('Reservations')}
           </Link>
         </li>
         <li className="nav-item">
           <Link to="/equipment" className={`nav-link ${isActive('/equipment')}`}>
-            Equipment Management
+            {translate('Equipment Management')}
           </Link>
         </li>
         <li className="nav-item">
           <Link to="/users" className={`nav-link ${isActive('/users')}`}>
-            User Management
+            {translate('User Management')}
           </Link>
         </li>
         <li className="nav-item" style={{ marginLeft: 'auto' }}>
@@ -49,7 +50,7 @@ function Navigation() {
             className="nav-link" 
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
-            Logout
+            {translate('Logout')}
           </button>
         </li>
       </ul>
