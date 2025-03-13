@@ -1,7 +1,7 @@
 // Japanese translations for UI text
 const translations = {
   // Navigation
-  'NcReserve': 'NcReserve',
+  'LaboMachineTable': 'LaboMachineTable',
   'Equipment Layout': '装置の配置',
   'Reservations': '予約状況',
   'Equipment Management': '装置管理',
@@ -9,7 +9,7 @@ const translations = {
   'Logout': 'ログアウト',
   
   // Login Page
-  'Login to NcReserve': 'NcReserveにログイン',
+  'Login to LaboMachineTable': 'LaboMachineTableにログイン',
   'Username': 'ユーザ名',
   'Password': 'パスワード',
   'Login': 'ログイン',
@@ -40,6 +40,7 @@ const translations = {
   'Edit Layout': 'レイアウトを編集',
   'Save Layout': 'レイアウトを保存',
   'Cancel': 'キャンセル',
+  'In use by:': '使用者:',
   
   // Reservation Status Page
   'Reservation Status': '予約状況',
@@ -48,6 +49,9 @@ const translations = {
   'Status': '状態',
   'Available': '利用可能',
   'Reserved': '予約済み',
+  'Reserved by:': '予約者:',
+  'Refresh': '更新',
+  'Click on equipment name or time slot to make a reservation.': '装置名または時間帯をクリックして予約を行なってください。',
   
   // Reservation Window
   'Reserve Equipment': '装置を予約',

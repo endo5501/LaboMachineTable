@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ReservationWindow from '../components/ReservationWindow';
+import translate from '../utils/translate';
 
 function EquipmentLayoutPage() {
   const [equipment, setEquipment] = useState([]);
@@ -20,13 +21,49 @@ function EquipmentLayoutPage() {
     try {
       setLoading(true);
       
-      // Fetch equipment and layout data in parallel
-      const [equipmentResponse, layoutResponse] = await Promise.all([
+      // Fetch equipment, layout, reservation, and user data in parallel
+      const [equipmentResponse, layoutResponse, reservationsResponse, usersResponse] = await Promise.all([
         axios.get('/api/equipment'),
-        axios.get('/api/layout')
+        axios.get('/api/layout'),
+        axios.get('/api/reservations'),
+        axios.get('/api/users')
       ]);
       
-      setEquipment(equipmentResponse.data);
+      // Get current date and time
+      const now = new Date();
+      
+      // Process equipment data to include current user information
+      const equipmentData = equipmentResponse.data;
+      const reservations = reservationsResponse.data;
+      const users = usersResponse.data;
+      
+      // Create a map of user IDs to usernames for quick lookup
+      const userMap = {};
+      users.forEach(user => {
+        userMap[user.id] = user.username;
+      });
+      
+      // Find current reservations for each equipment
+      const equipmentWithUsers = equipmentData.map(equipment => {
+        const currentReservation = reservations.find(reservation => {
+          const startTime = new Date(reservation.start_time);
+          const endTime = new Date(reservation.end_time);
+          return reservation.equipment_id === equipment.id && 
+                 now >= startTime && 
+                 now <= endTime;
+        });
+        
+        // Get the username if there's a current reservation
+        const userId = currentReservation ? currentReservation.user_id : null;
+        const username = userId ? userMap[userId] : null;
+        
+        return {
+          ...equipment,
+          current_user: username
+        };
+      });
+      
+      setEquipment(equipmentWithUsers);
       setLayout(layoutResponse.data);
       setError('');
     } catch (err) {
@@ -167,7 +204,7 @@ function EquipmentLayoutPage() {
     <div className="container">
       <div className="card">
         <div className="card-header">
-          <h2 className="card-title">Equipment Layout</h2>
+          <h2 className="card-title">{translate('Equipment Layout')}</h2>
           <div>
             <button 
               onClick={toggleEditMode}
@@ -176,7 +213,7 @@ function EquipmentLayoutPage() {
                 marginRight: '10px'
               }}
             >
-              {editMode ? 'Cancel Edit' : 'Edit Layout'}
+              {editMode ? translate('Cancel') : translate('Edit Layout')}
             </button>
             
             {editMode && (
@@ -184,7 +221,7 @@ function EquipmentLayoutPage() {
                 onClick={saveLayout}
                 style={{ backgroundColor: '#28a745' }}
               >
-                Save Layout
+                {translate('Save Layout')}
               </button>
             )}
           </div>
@@ -226,7 +263,7 @@ function EquipmentLayoutPage() {
               >
                 <div className="equipment-name">{item.name}</div>
                 {item.current_user && (
-                  <div className="user-name">In use by: {item.current_user}</div>
+                  <div className="user-name">{translate('In use by:')} {item.current_user}</div>
                 )}
               </div>
             ))}

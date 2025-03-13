@@ -17,7 +17,7 @@ function Navigation() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar-brand">{translate('NcReserve')}</Link>
+      <Link to="/" className="navbar-brand">{translate('LaboMachineTable')}</Link>
       <ul className="navbar-nav">
         <li className="nav-item">
           <Link to="/layout" className={`nav-link ${isActive('/layout')}`}>

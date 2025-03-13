@@ -34,7 +34,7 @@ function LoginPage() {
 
   return (
     <div className="auth-container">
-      <h2 className="auth-title">{translate('Login to NcReserve')}</h2>
+      <h2 className="auth-title">{translate('Login to LaboMachineTable')}</h2>
       
       {error && (
         <div className="alert" style={{ 
