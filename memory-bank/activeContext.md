@@ -35,6 +35,10 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - Enhanced the login page functionality with proper error handling
 - Improved the equipment management interface
 - Created Japanese version of README.md (README.ja.md) to support internationalization efforts
+- Fixed API routing issues after package updates by implementing a custom axios instance with request interceptors
+- Created axiosConfig.js utility to ensure all API requests include the /api prefix
+- Updated all components to use the custom axios instance for consistent API communication
+- Simplified setupProxy.js to focus on properly routing /api requests to the backend server
 
 ## Next Steps
 

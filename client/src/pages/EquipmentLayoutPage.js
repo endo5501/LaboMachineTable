@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import axios from '../utils/axiosConfig';
 import ReservationWindow from '../components/ReservationWindow';
 import translate from '../utils/translate';
 

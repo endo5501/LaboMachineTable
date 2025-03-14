@@ -47,6 +47,8 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - ✅ Centralized translations.js file with Japanese translations
 - ✅ translate.js utility function implementation
 - ✅ Japanese version of README.md (README.ja.md) created
+- ✅ Custom axios configuration with request interceptors for consistent API communication
+- ✅ API routing fixes after package updates
 
 ## Features In Progress
 
@@ -99,35 +101,44 @@ As the project has advanced in the implementation phase, we have encountered and
      - Added client/.env.development and client/.env.production for environment-specific settings
      - Updated server.js to use port 5001 as the default fallback port (instead of 5000) to avoid conflicts with AirPlay even when .env file is not present
 
-2. **Equipment Layout Visualization**
+2. **API Routing After Package Updates**
+   - Issue: After updating the http-proxy-middleware package to version 3.0.3, API requests were failing with 404 errors
+   - Status: Resolved
+   - Solution:
+     - Created a custom axios instance with request interceptors in axiosConfig.js
+     - Implemented an interceptor to automatically add the /api prefix to requests if not already present
+     - Updated all components to use the custom axios instance
+     - Simplified setupProxy.js to focus on properly routing /api requests
+
+3. **Equipment Layout Visualization**
    - Issue: Performance with large numbers of equipment items
    - Status: Implemented with drag-and-drop functionality
    - Mitigation: Monitoring performance and considering virtualization techniques for rendering if needed
 
-3. **Reservation Conflict Detection**
+4. **Reservation Conflict Detection**
    - Issue: Potential race conditions in concurrent reservations
    - Status: Implemented server-side validation
    - Current implementation: ReservationWindow component checks for existing reservations and prevents selection of already reserved time slots
    - Next Steps: Enhance with more user-friendly feedback and optimistic locking
 
-4. **Real-time Updates**
+5. **Real-time Updates**
    - Issue: Keeping all clients in sync with reservation changes
    - Status: Currently using polling approach
    - Implementation: ReservationStatusPage has a refresh button to manually update the reservation data
    - Next Steps: Evaluate WebSocket implementation for more efficient real-time updates
 
-5. **Internationalization Coverage**
+6. **Internationalization Coverage**
    - Issue: Ensuring all user-facing text is properly internationalized
    - Status: Core translation infrastructure implemented with translations.js and translate.js
    - Current status: ReservationStatusPage uses translation, but ReservationWindow component still needs internationalization
    - Next Steps: Complete translation coverage for all components, particularly the ReservationWindow component
 
-6. **Text Label Positioning**
+7. **Text Label Positioning**
    - Issue: Ensuring text labels don't overlap with equipment in layout
    - Status: Basic implementation complete
    - Next Steps: Add collision detection and automatic positioning suggestions
 
-7. **Reservation Date Handling**
+8. **Reservation Date Handling**
    - Issue: Ensuring proper date handling for reservations across different timezones
    - Status: Basic implementation using date-fns library
    - Current implementation: ReservationStatusPage allows date selection for viewing reservations
