@@ -195,6 +195,18 @@ npm run build
 - **winston**: Logging library
 - **morgan**: HTTP request logger
 
+### Environment Variables
+
+#### Server Environment Variables
+The server requires the following environment variables to be set in the `server/.env` file:
+- **PORT**: The port number for the server to listen on (default: 5000)
+- **NODE_ENV**: The environment mode ('development' or 'production')
+- **JWT_SECRET**: Secret key for JWT token generation and verification
+
+#### Client Environment Variables
+The client uses the following environment variables in the `client/.env.development` and `client/.env.production` files:
+- **REACT_APP_API_URL**: The URL of the API server (e.g., 'http://localhost:5001' for development)
+
 ### Internationalization Dependencies
 - **translations.js**: Custom utility for storing English to Japanese text mappings
 - **translate.js**: Custom utility function for text translation

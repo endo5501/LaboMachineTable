@@ -91,7 +91,12 @@ As the project has advanced in the implementation phase, we have encountered and
 1. **Port Conflict Issue**
    - Issue: Server port 5000 was already in use by another system process
    - Status: Resolved
-   - Solution: Configured server to use port 5001 and updated client proxy configuration
+   - Solution: 
+     - Configured server to use port 5001 in server/.env
+     - Enhanced environment variable configuration with NODE_ENV and JWT_SECRET
+     - Made client-server connection configurable through environment variables
+     - Implemented setupProxy.js to dynamically set API URL based on environment
+     - Added client/.env.development and client/.env.production for environment-specific settings
 
 2. **Equipment Layout Visualization**
    - Issue: Performance with large numbers of equipment items

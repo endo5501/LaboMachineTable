@@ -23,6 +23,11 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - Added calendar-based reservation view with time slot selection
 - Implemented ReservationWindow component with time slot selection interface
 - Fixed port conflict issue by configuring server to use port 5001
+- Enhanced server configuration by adding NODE_ENV and JWT_SECRET to the .env file to ensure proper environment variable loading
+- Improved client-server configuration by making the API URL configurable through environment variables
+- Removed hardcoded proxy setting from client/package.json
+- Added client/.env.development and client/.env.production files for environment-specific API URLs
+- Implemented setupProxy.js to dynamically set the API proxy based on environment variables
 - Implemented internationalization support with translations utility
 - Created centralized translations.js file with Japanese translations
 - Implemented translate.js utility function for text translation
