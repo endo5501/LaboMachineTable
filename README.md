@@ -28,7 +28,7 @@ LaboMachineTable is a web application designed to manage and streamline the rese
 1. Clone the repository:
    ```bash
    git clone <repository-url>
-   cd nc-reserve
+   cd LaboMachineTable
    ```
 
 2. Install dependencies:
@@ -66,7 +66,7 @@ npm run dev
 ## Project Structure
 
 ```
-nc-reserve/
+LaboMachineTable/
 ├── client/                 # Frontend React application
 ├── server/                 # Backend Node.js/Express application
 ├── database/               # Database files and migrations

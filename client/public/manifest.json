@@ -1,6 +1,6 @@
 {
-  "short_name": "NcReserve",
-  "name": "NcReserve - Laboratory Equipment Reservation",
+  "short_name": "LaboMachineTable",
+  "name": "LaboMachineTable - Laboratory Equipment Reservation",
   "icons": [
     {
       "src": "favicon.ico",

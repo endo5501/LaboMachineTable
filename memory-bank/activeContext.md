@@ -1,8 +1,8 @@
-# Active Context: NcReserve
+# Active Context: LaboMachineTable
 
 ## Current Focus
 
-The LaboMachineTable (NcReserve) project has progressed significantly in the implementation phase. The core application structure is in place and functional with key features implemented. We are currently:
+The LaboMachineTable project has progressed significantly in the implementation phase. The core application structure is in place and functional with key features implemented. We are currently:
 
 1. Refining the laboratory equipment reservation system functionality
 2. Testing and enhancing the user interface and experience

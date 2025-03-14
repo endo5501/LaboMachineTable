@@ -1,8 +1,8 @@
-# System Patterns: NcReserve
+# System Patterns: LaboMachineTable
 
 ## System Architecture Overview
 
-NcReserve follows a modern web application architecture with clear separation of concerns:
+LaboMachineTable follows a modern web application architecture with clear separation of concerns:
 
 ```mermaid
 flowchart TD

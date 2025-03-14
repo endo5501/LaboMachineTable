@@ -1,8 +1,8 @@
-# Technical Context: NcReserve
+# Technical Context: LaboMachineTable
 
 ## Technology Stack
 
-NcReserve is built using a modern JavaScript stack with the following core technologies:
+LaboMachineTable is built using a modern JavaScript stack with the following core technologies:
 
 ### Frontend
 - **JavaScript**: Core programming language
@@ -37,7 +37,7 @@ NcReserve is built using a modern JavaScript stack with the following core techn
 
 ### Project Structure
 ```
-nc-reserve/
+LaboMachineTable/
 ├── client/                 # Frontend React application
 │   ├── public/             # Static files
 │   ├── src/                # Source code
@@ -80,7 +80,7 @@ nc-reserve/
 #### Clone Repository
 ```bash
 git clone <repository-url>
-cd nc-reserve
+cd LaboMachineTable
 ```
 
 #### Install Dependencies

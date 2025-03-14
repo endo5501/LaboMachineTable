@@ -1,4 +1,4 @@
-# Product Context: NcReserve
+# Product Context: LaboMachineTable
 
 ## Problem Statement
 Laboratory environments face significant challenges in managing equipment usage efficiently:
@@ -9,7 +9,7 @@ Laboratory environments face significant challenges in managing equipment usage 
 4. **User Coordination**: Researchers and staff have limited visibility into when equipment will be available
 5. **Administrative Overhead**: Managing equipment access and reservations manually creates unnecessary administrative burden
 
-NcReserve addresses these challenges by providing a centralized, visual, and intuitive system for equipment reservation management.
+LaboMachineTable addresses these challenges by providing a centralized, visual, and intuitive system for equipment reservation management.
 
 ## User Personas
 

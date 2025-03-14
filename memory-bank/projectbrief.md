@@ -1,7 +1,7 @@
-# Project Brief: NcReserve (LaboMachineTable)
+# Project Brief: LaboMachineTable
 
 ## Project Overview
-NcReserve (LaboMachineTable) is a web application designed to manage and streamline the reservation process for laboratory equipment. The system allows users to view equipment availability, make reservations, and manage equipment and user data with support for both English and Japanese languages.
+LaboMachineTable is a web application designed to manage and streamline the reservation process for laboratory equipment. The system allows users to view equipment availability, make reservations, and manage equipment and user data with support for both English and Japanese languages.
 
 ## Purpose
 To create an efficient and user-friendly system for laboratory equipment reservation that replaces manual booking methods, reduces scheduling conflicts, and optimizes equipment utilization.

@@ -1,4 +1,4 @@
-# Project Progress: NcReserve
+# Project Progress: LaboMachineTable
 
 ## Project Timeline
 
@@ -15,7 +15,7 @@
 
 **Overall Project Status**: Advanced Implementation Phase
 
-The LaboMachineTable (NcReserve) project has progressed significantly in the implementation phase. We have successfully set up the development environment, implemented the complete application structure, and created the core functionality. The application is now fully functional with user authentication, equipment management, equipment layout visualization with drag-and-drop functionality, text label support, and a comprehensive reservation system with calendar view.
+The LaboMachineTable project has progressed significantly in the implementation phase. We have successfully set up the development environment, implemented the complete application structure, and created the core functionality. The application is now fully functional with user authentication, equipment management, equipment layout visualization with drag-and-drop functionality, text label support, and a comprehensive reservation system with calendar view.
 
 ## Completed Features
 
