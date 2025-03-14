@@ -198,6 +198,7 @@ npm run build
 ### Internationalization Dependencies
 - **translations.js**: Custom utility for storing English to Japanese text mappings
 - **translate.js**: Custom utility function for text translation
+- **date-fns**: Used for date formatting and manipulation with internationalization support
 
 ## Technical Constraints
 
@@ -401,57 +402,122 @@ The application implements internationalization to support both English and Japa
 
 1. **Translation Mapping**:
    - A central `translations.js` file contains mappings from English text to Japanese translations
-   - Organized by functional areas (e.g., authentication, equipment, reservations)
+   - Organized by functional areas (e.g., navigation, login, equipment management, reservations)
+   - Flat structure with direct key-value pairs for simplicity and ease of maintenance
 
 2. **Translation Utility**:
    - The `translate.js` utility provides a function that looks up translations
-   - Default language is English, with Japanese translations applied when selected
+   - Default language is English, with Japanese translations applied when needed
+   - Simple implementation that returns the original text if no translation is found
 
 3. **Component Integration**:
    - All user-facing text is wrapped in the translation function
-   - Components receive translated text based on the current language setting
+   - Components use the translate function for all displayed text
+   - Example: `<h2 className="card-title">{translate('Reservation Status')}</h2>`
 
 4. **Documentation**:
    - Project documentation is provided in both English (README.md) and Japanese (README.ja.md)
    - Documentation follows language-specific formatting conventions
 
-### Example Implementation
+### Current Implementation
+
+The current implementation uses a simple and effective approach:
+
 ```javascript
-// translations.js
-export const translations = {
-  common: {
-    submit: "送信",
-    cancel: "キャンセル",
-    save: "保存",
-    delete: "削除"
-  },
-  equipment: {
-    name: "装置名",
-    type: "種類",
-    description: "説明"
-  }
+// translations.js - Actual implementation
+const translations = {
+  // Navigation
+  'LaboMachineTable': 'LaboMachineTable',
+  'Equipment Layout': '装置の配置',
+  'Reservations': '予約状況',
+  'Equipment Management': '装置管理',
+  'User Management': 'ユーザ管理',
+  'Logout': 'ログアウト',
+  
+  // Login Page
+  'Login to LaboMachineTable': 'LaboMachineTableにログイン',
+  'Username': 'ユーザ名',
+  'Password': 'パスワード',
+  'Login': 'ログイン',
+  
+  // Reservation Status Page
+  'Reservation Status': '予約状況',
+  'Time': '時間',
+  'Equipment': '装置',
+  'Status': '状態',
+  'Available': '利用可能',
+  'Reserved': '予約済み',
+  'Reserved by:': '予約者:',
+  'Refresh': '更新',
+  
+  // Common
+  'Save': '保存',
+  'Edit': '編集',
+  'Delete': '削除',
+  'Cancel': 'キャンセル',
+  'Confirm': '確認',
+  'Loading...': '読み込み中...',
+  'No data available': 'データがありません',
 };
 
-// translate.js
-export const translate = (text, language = 'en') => {
-  if (language === 'en') return text;
+// translate.js - Actual implementation
+const translate = (text) => {
+  if (!text) return '';
   
-  // Navigate through the translations object to find the Japanese text
-  const sections = Object.keys(translations);
-  for (const section of sections) {
-    if (translations[section][text]) {
-      return translations[section][text];
-    }
-  }
-  
-  // Return original text if no translation found
-  return text;
-};
-
-// Component usage
-import { translate } from '../utils/translate';
-
-const SubmitButton = ({ language }) => {
-  return <button>{translate('submit', language)}</button>;
+  // Return the translation if it exists, otherwise return the original text
+  return translations[text] || text;
 };
 ```
+
+### Usage in Components
+
+The translation function is used throughout the application components:
+
+1. **ReservationStatusPage Component**:
+   ```javascript
+   // Import the translate function
+   import translate from '../utils/translate';
+   
+   // Use in component rendering
+   <h2 className="card-title">{translate('Reservation Status')}</h2>
+   <button onClick={fetchData}>{translate('Refresh')}</button>
+   <p>{translate('Loading...')}</p>
+   <p>{translate('Click on equipment name or time slot to make a reservation.')}</p>
+   ```
+
+2. **Other Components**:
+   The same pattern is used across all components that display text to the user.
+
+### Internationalization Coverage Status
+
+- **Fully Internationalized Components**:
+  - ReservationStatusPage
+  - Navigation
+  - LoginPage
+  - EquipmentManagementPage
+
+- **Partially Internationalized Components**:
+  - EquipmentLayoutPage
+
+- **Components Needing Internationalization**:
+  - ReservationWindow
+
+### Future Enhancements
+
+1. **Language Selection**:
+   - Add a language selector UI component
+   - Store language preference in user settings
+
+2. **Dynamic Language Loading**:
+   - Split translations into separate files by language
+   - Load translations dynamically based on selected language
+
+3. **Date and Time Formatting**:
+   - Enhance date-fns usage for locale-specific date and time formatting
+   - Implement locale-aware date formatting for reservations
+
+4. **Number Formatting**:
+   - Add support for locale-specific number formatting
+
+5. **Right-to-Left (RTL) Support**:
+   - Add infrastructure for RTL languages if needed in the future

@@ -39,11 +39,13 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - ✅ Equipment management screens
 - ✅ Equipment layout visualization with drag-and-drop
 - ✅ Text label support in equipment layout
-- ✅ Reservation window interface
-- ✅ Calendar-based reservation view
-- ✅ Time slot selection system
-- ✅ Reservation conflict detection
+- ✅ Reservation window interface with time slot selection (ReservationWindow component)
+- ✅ Calendar-based reservation view (ReservationStatusPage component)
+- ✅ Time slot selection system with 30-minute intervals from 8:00 to 22:00
+- ✅ Reservation conflict detection and prevention
 - ✅ Internationalization infrastructure with translation utility
+- ✅ Centralized translations.js file with Japanese translations
+- ✅ translate.js utility function implementation
 - ✅ Japanese version of README.md (README.ja.md) created
 
 ## Features In Progress
@@ -54,7 +56,8 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - 🔄 Reservation notifications
 - 🔄 Enhanced data validation and error handling
 - 🔄 API integration refinement
-- 🔄 Complete internationalization implementation
+- 🔄 Complete internationalization implementation for all components
+- 🔄 Internationalization of ReservationWindow component
 - 🔄 Navigation component enhancement
 - 🔄 Mobile responsiveness optimization
 
@@ -98,22 +101,31 @@ As the project has advanced in the implementation phase, we have encountered and
 3. **Reservation Conflict Detection**
    - Issue: Potential race conditions in concurrent reservations
    - Status: Implemented server-side validation
+   - Current implementation: ReservationWindow component checks for existing reservations and prevents selection of already reserved time slots
    - Next Steps: Enhance with more user-friendly feedback and optimistic locking
 
 4. **Real-time Updates**
    - Issue: Keeping all clients in sync with reservation changes
    - Status: Currently using polling approach
+   - Implementation: ReservationStatusPage has a refresh button to manually update the reservation data
    - Next Steps: Evaluate WebSocket implementation for more efficient real-time updates
 
 5. **Internationalization Coverage**
    - Issue: Ensuring all user-facing text is properly internationalized
-   - Status: Core translation infrastructure implemented
-   - Next Steps: Complete translation coverage for all components and add support for additional languages
+   - Status: Core translation infrastructure implemented with translations.js and translate.js
+   - Current status: ReservationStatusPage uses translation, but ReservationWindow component still needs internationalization
+   - Next Steps: Complete translation coverage for all components, particularly the ReservationWindow component
 
 6. **Text Label Positioning**
    - Issue: Ensuring text labels don't overlap with equipment in layout
    - Status: Basic implementation complete
    - Next Steps: Add collision detection and automatic positioning suggestions
+
+7. **Reservation Date Handling**
+   - Issue: Ensuring proper date handling for reservations across different timezones
+   - Status: Basic implementation using date-fns library
+   - Current implementation: ReservationStatusPage allows date selection for viewing reservations
+   - Next Steps: Enhance date handling to account for timezone differences
 
 ## Testing Status
 

@@ -4,11 +4,11 @@
 
 The LaboMachineTable project has progressed significantly in the implementation phase. The core application structure is in place and functional with key features implemented. We are currently:
 
-1. Refining the laboratory equipment reservation system functionality
+1. Refining the laboratory equipment reservation system functionality, particularly the ReservationWindow component
 2. Testing and enhancing the user interface and experience
 3. Ensuring proper integration between frontend and backend components
 4. Addressing any issues that arise during development
-5. Completing the internationalization implementation across all components
+5. Completing the internationalization implementation across all components, with focus on the reservation system
 
 ## Recent Changes
 
@@ -21,8 +21,11 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - Added text label functionality to the equipment layout
 - Implemented comprehensive reservation system functionality
 - Added calendar-based reservation view with time slot selection
+- Implemented ReservationWindow component with time slot selection interface
 - Fixed port conflict issue by configuring server to use port 5001
 - Implemented internationalization support with translations utility
+- Created centralized translations.js file with Japanese translations
+- Implemented translate.js utility function for text translation
 - Enhanced the login page functionality with proper error handling
 - Improved the equipment management interface
 - Created Japanese version of README.md (README.ja.md) to support internationalization efforts
@@ -106,6 +109,7 @@ The LaboMachineTable project has progressed significantly in the implementation 
    - Decision: Use a time-slot based selection interface
    - Rationale: Clear visual representation of available and booked times
    - Consideration: Mobile-friendly interaction for touch devices
+   - Implementation: ReservationWindow component with 30-minute time slots from 8:00 to 22:00
 
 3. **Navigation Structure**
    - Decision: Use a sidebar navigation with clear section indicators
@@ -116,6 +120,7 @@ The LaboMachineTable project has progressed significantly in the implementation 
    - Decision: Implement a translation system using a utility function and JSON-based translation files
    - Rationale: Support for multiple languages enhances accessibility and user experience
    - Consideration: Ensure all user-facing text is properly internationalized
+   - Implementation: translations.js for mapping English to Japanese and translate.js utility function
 
 ### Technical Considerations
 
@@ -144,11 +149,13 @@ The LaboMachineTable project has progressed significantly in the implementation 
 2. **Reservation Conflict Prevention**
    - Challenge: Ensuring no double-bookings occur
    - Approach: Implemented server-side validation with transaction support
+   - Current implementation: ReservationWindow component checks for existing reservations and prevents selection of already reserved time slots
    - Next steps: Enhance the conflict detection algorithm with more user-friendly feedback
 
 3. **Real-time Updates**
    - Challenge: Keeping reservation status current across users
    - Approach: Currently using polling approach for updates
+   - Implementation: ReservationStatusPage has a refresh button to manually update the reservation data
    - Next steps: Evaluate WebSocket implementation for more efficient real-time updates
 
 4. **User Experience Consistency**
@@ -158,8 +165,9 @@ The LaboMachineTable project has progressed significantly in the implementation 
 
 5. **Internationalization Completion**
    - Challenge: Ensuring all user-facing text is properly internationalized
-   - Approach: Created a centralized translation system with utility functions
-   - Next steps: Complete translation coverage for all components and add support for additional languages
+   - Approach: Created a centralized translation system with translations.js and translate.js
+   - Current status: ReservationStatusPage uses translation, but ReservationWindow component still needs internationalization
+   - Next steps: Complete translation coverage for all components, particularly the ReservationWindow component
 
 ## Team Communication
 
