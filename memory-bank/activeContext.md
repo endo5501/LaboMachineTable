@@ -24,6 +24,7 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - Implemented ReservationWindow component with time slot selection interface
 - Fixed port conflict issue by configuring server to use port 5001
 - Enhanced server configuration by adding NODE_ENV and JWT_SECRET to the .env file to ensure proper environment variable loading
+- Updated server.js to use port 5001 as the default fallback port (instead of 5000) to avoid conflicts with AirPlay on Mac systems even when .env file is not present
 - Improved client-server configuration by making the API URL configurable through environment variables
 - Removed hardcoded proxy setting from client/package.json
 - Added client/.env.development and client/.env.production files for environment-specific API URLs

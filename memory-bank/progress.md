@@ -89,7 +89,7 @@ The LaboMachineTable project has progressed significantly in the implementation 
 As the project has advanced in the implementation phase, we have encountered and addressed several issues:
 
 1. **Port Conflict Issue**
-   - Issue: Server port 5000 was already in use by another system process
+   - Issue: Server port 5000 was already in use by another system process (AirPlay on Mac)
    - Status: Resolved
    - Solution: 
      - Configured server to use port 5001 in server/.env
@@ -97,6 +97,7 @@ As the project has advanced in the implementation phase, we have encountered and
      - Made client-server connection configurable through environment variables
      - Implemented setupProxy.js to dynamically set API URL based on environment
      - Added client/.env.development and client/.env.production for environment-specific settings
+     - Updated server.js to use port 5001 as the default fallback port (instead of 5000) to avoid conflicts with AirPlay even when .env file is not present
 
 2. **Equipment Layout Visualization**
    - Issue: Performance with large numbers of equipment items
