@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from '../utils/axiosConfig';
 import { format, parse, addMinutes, isWithinInterval } from 'date-fns';
 import { useAuth } from '../contexts/AuthContext';
+import translate from '../utils/translate';
 
 function ReservationWindow({ equipment, onClose }) {
   const [timeSlots, setTimeSlots] = useState([]);
@@ -13,16 +14,16 @@ function ReservationWindow({ equipment, onClose }) {
   const { currentUser } = useAuth();
 
   useEffect(() => {
-    // Generate time slots from 8:00 to 22:00 in 30-minute intervals
+    // Generate time slots from 0:00 to 23:30 in 30-minute intervals
     const slots = [];
-    const startTime = parse('08:00', 'HH:mm', new Date());
-    const endTime = parse('22:00', 'HH:mm', new Date());
+    const startTime = parse('00:00', 'HH:mm', new Date());
+    const endTime = parse('23:30', 'HH:mm', new Date());
     
     let currentTime = startTime;
     while (currentTime <= endTime) {
       slots.push({
         time: format(currentTime, 'HH:mm'),
-        label: format(currentTime, 'h:mm a')
+        label: format(currentTime, 'HH:mm')
       });
       currentTime = addMinutes(currentTime, 30);
     }
@@ -75,7 +76,7 @@ function ReservationWindow({ equipment, onClose }) {
 
   const handleSave = async () => {
     if (selectedSlots.length === 0) {
-      setError('Please select at least one time slot.');
+      setError(translate('Please select at least one time slot.'));
       return;
     }
     
@@ -113,7 +114,7 @@ function ReservationWindow({ equipment, onClose }) {
       onClose();
     } catch (err) {
       console.error('Error saving reservation:', err);
-      setError('Failed to save reservation. Please try again.');
+      setError(translate('Failed to save reservation. Please try again.'));
       setSaving(false);
     }
   };
@@ -122,7 +123,7 @@ function ReservationWindow({ equipment, onClose }) {
     <div className="reservation-window">
       <div className="reservation-window-header">
         <h3 className="reservation-window-title">
-          Reserve {equipment.name}
+          {translate('Reserve')} {equipment.name}
         </h3>
         <button className="close-button" onClick={onClose}>×</button>
       </div>
@@ -140,7 +141,7 @@ function ReservationWindow({ equipment, onClose }) {
       )}
       
       {loading ? (
-        <p>Loading reservation data...</p>
+        <p>{translate('Loading...')}</p>
       ) : (
         <>
           <div className="time-slots">
@@ -153,7 +154,7 @@ function ReservationWindow({ equipment, onClose }) {
                 <span className="time-label">{slot.label}</span>
                 {isSlotReserved(slot) && (
                   <span style={{ marginLeft: 'auto', fontSize: '0.8rem', color: '#721c24' }}>
-                    Reserved
+                    {translate('Reserved')}
                   </span>
                 )}
               </div>
@@ -166,13 +167,13 @@ function ReservationWindow({ equipment, onClose }) {
               onClick={onClose}
               disabled={saving}
             >
-              Cancel
+              {translate('Cancel')}
             </button>
             <button 
               onClick={handleSave}
               disabled={selectedSlots.length === 0 || saving}
             >
-              {saving ? 'Saving...' : 'Confirm Reservation'}
+              {saving ? translate('Saving...') : translate('Confirm Reservation')}
             </button>
           </div>
         </>

@@ -39,6 +39,10 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - Created axiosConfig.js utility to ensure all API requests include the /api prefix
 - Updated all components to use the custom axios instance for consistent API communication
 - Simplified setupProxy.js to focus on properly routing /api requests to the backend server
+- Completed internationalization of UserManagementPage by adding translations for all user-facing text
+- Removed "予約者:" and "使用者:" prefixes from ReservationStatusPage and EquipmentLayoutPage to show only usernames
+- Changed time display in ReservationWindow and ReservationStatusPage from 8:00-22:00 to 24-hour format (0:00-23:30)
+- Updated time display format from AM/PM to 24-hour format in reservation components
 
 ## Next Steps
 
@@ -176,8 +180,8 @@ The LaboMachineTable project has progressed significantly in the implementation 
 5. **Internationalization Completion**
    - Challenge: Ensuring all user-facing text is properly internationalized
    - Approach: Created a centralized translation system with translations.js and translate.js
-   - Current status: ReservationStatusPage uses translation, but ReservationWindow component still needs internationalization
-   - Next steps: Complete translation coverage for all components, particularly the ReservationWindow component
+   - Current status: Completed internationalization for UserManagementPage and ReservationWindow components
+   - Next steps: Continue to ensure all new components are properly internationalized
 
 ## Team Communication
 

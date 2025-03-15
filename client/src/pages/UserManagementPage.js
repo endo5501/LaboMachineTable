@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../utils/axiosConfig';
 import { useAuth } from '../contexts/AuthContext';
+import translate from '../utils/translate';
 
 function UserManagementPage() {
   const [users, setUsers] = useState([]);
@@ -27,7 +28,7 @@ function UserManagementPage() {
       setError('');
     } catch (err) {
       console.error('Error fetching users:', err);
-      setError('Failed to load users. Please try again later.');
+      setError(translate('Failed to load users. Please try again later.'));
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,7 @@ function UserManagementPage() {
       fetchUsers();
     } catch (err) {
       console.error('Error saving user:', err);
-      setError('Failed to save user. Please try again.');
+      setError(translate('Failed to save user. Please try again.'));
     }
   };
 
@@ -79,11 +80,11 @@ function UserManagementPage() {
   const handleDelete = async (id) => {
     // Prevent deleting yourself
     if (id === currentUser.id) {
-      setError("You cannot delete your own account.");
+      setError(translate("You cannot delete your own account."));
       return;
     }
     
-    if (!window.confirm('Are you sure you want to delete this user?')) {
+    if (!window.confirm(translate('Are you sure you want to delete this user?'))) {
       return;
     }
     
@@ -92,7 +93,7 @@ function UserManagementPage() {
       fetchUsers();
     } catch (err) {
       console.error('Error deleting user:', err);
-      setError('Failed to delete user. Please try again.');
+      setError(translate('Failed to delete user. Please try again.'));
     }
   };
 
@@ -105,7 +106,7 @@ function UserManagementPage() {
     <div className="container">
       <div className="card">
         <div className="card-header">
-          <h2 className="card-title">User Management</h2>
+          <h2 className="card-title">{translate('User Management')}</h2>
         </div>
         
         {error && (
@@ -122,7 +123,7 @@ function UserManagementPage() {
         
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">{translate('Username')}</label>
             <input
               type="text"
               id="username"
@@ -136,7 +137,7 @@ function UserManagementPage() {
           
           <div className="form-group">
             <label htmlFor="password">
-              Password {editingId && '(Leave blank to keep current password)'}
+              {translate('Password')} {editingId && `(${translate('Leave blank to keep current password')})`}
             </label>
             <input
               type="password"
@@ -149,7 +150,7 @@ function UserManagementPage() {
           </div>
           
           <div className="form-group">
-            <label htmlFor="name">Name</label>
+            <label htmlFor="name">{translate('Name')}</label>
             <input
               type="text"
               id="name"
@@ -160,7 +161,7 @@ function UserManagementPage() {
           </div>
           
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{translate('Email')}</label>
             <input
               type="email"
               id="email"
@@ -172,7 +173,7 @@ function UserManagementPage() {
           
           <div style={{ display: 'flex', gap: '10px' }}>
             <button type="submit">
-              {editingId ? 'Update User' : 'Add User'}
+              {editingId ? translate('Update User') : translate('Add User')}
             </button>
             
             {editingId && (
@@ -181,7 +182,7 @@ function UserManagementPage() {
                 onClick={handleCancel}
                 style={{ backgroundColor: '#6c757d' }}
               >
-                Cancel
+                {translate('Cancel')}
               </button>
             )}
           </div>
@@ -190,27 +191,27 @@ function UserManagementPage() {
       
       <div className="card">
         <div className="card-header">
-          <h3 className="card-title">User List</h3>
+          <h3 className="card-title">{translate('User List')}</h3>
         </div>
         
         {loading ? (
-          <p>Loading users...</p>
+          <p>{translate('Loading users...')}</p>
         ) : (
           <div className="table-container">
             <table className="table">
               <thead>
                 <tr>
-                  <th>Username</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Actions</th>
+                  <th>{translate('Username')}</th>
+                  <th>{translate('Name')}</th>
+                  <th>{translate('Email')}</th>
+                  <th>{translate('Actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 {users.length === 0 ? (
                   <tr>
                     <td colSpan="4" style={{ textAlign: 'center' }}>
-                      No users found. Add some users above.
+                      {translate('No users found. Add some users above.')}
                     </td>
                   </tr>
                 ) : (
@@ -228,7 +229,7 @@ function UserManagementPage() {
                               padding: '0.25rem 0.5rem'
                             }}
                           >
-                            Edit
+                            {translate('Edit')}
                           </button>
                           <button 
                             onClick={() => handleDelete(user.id)}
@@ -238,7 +239,7 @@ function UserManagementPage() {
                             }}
                             disabled={user.id === currentUser?.id}
                           >
-                            Delete
+                            {translate('Delete')}
                           </button>
                         </div>
                       </td>

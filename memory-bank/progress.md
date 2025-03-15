@@ -41,7 +41,7 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - ✅ Text label support in equipment layout
 - ✅ Reservation window interface with time slot selection (ReservationWindow component)
 - ✅ Calendar-based reservation view (ReservationStatusPage component)
-- ✅ Time slot selection system with 30-minute intervals from 8:00 to 22:00
+- ✅ Time slot selection system with 30-minute intervals in 24-hour format (0:00-23:30)
 - ✅ Reservation conflict detection and prevention
 - ✅ Internationalization infrastructure with translation utility
 - ✅ Centralized translations.js file with Japanese translations
@@ -49,6 +49,9 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - ✅ Japanese version of README.md (README.ja.md) created
 - ✅ Custom axios configuration with request interceptors for consistent API communication
 - ✅ API routing fixes after package updates
+- ✅ Internationalization of UserManagementPage component
+- ✅ Internationalization of ReservationWindow component
+- ✅ Simplified user display by removing "予約者:" and "使用者:" prefixes
 
 ## Features In Progress
 
@@ -59,7 +62,6 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - 🔄 Enhanced data validation and error handling
 - 🔄 API integration refinement
 - 🔄 Complete internationalization implementation for all components
-- 🔄 Internationalization of ReservationWindow component
 - 🔄 Navigation component enhancement
 - 🔄 Mobile responsiveness optimization
 
@@ -130,8 +132,8 @@ As the project has advanced in the implementation phase, we have encountered and
 6. **Internationalization Coverage**
    - Issue: Ensuring all user-facing text is properly internationalized
    - Status: Core translation infrastructure implemented with translations.js and translate.js
-   - Current status: ReservationStatusPage uses translation, but ReservationWindow component still needs internationalization
-   - Next Steps: Complete translation coverage for all components, particularly the ReservationWindow component
+   - Current status: Completed internationalization for UserManagementPage and ReservationWindow components
+   - Next Steps: Continue to ensure all new components are properly internationalized
 
 7. **Text Label Positioning**
    - Issue: Ensuring text labels don't overlap with equipment in layout

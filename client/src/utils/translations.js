@@ -33,7 +33,17 @@ const translations = {
   'Name': '名前',
   'Email': 'メールアドレス',
   'Add User': 'ユーザを追加',
+  'Update User': 'ユーザを更新',
   'User List': 'ユーザ一覧',
+  'Loading users...': 'ユーザを読み込み中...',
+  'Failed to load users. Please try again later.': 'ユーザの読み込みに失敗しました。後でもう一度お試しください。',
+  'Failed to save user. Please try again.': 'ユーザの保存に失敗しました。もう一度お試しください。',
+  'You cannot delete your own account.': '自分のアカウントを削除することはできません。',
+  'Are you sure you want to delete this user?': 'このユーザを削除してもよろしいですか？',
+  'Failed to delete user. Please try again.': 'ユーザの削除に失敗しました。もう一度お試しください。',
+  'Leave blank to keep current password': '現在のパスワードを維持する場合は空白のままにしてください',
+  'No users found. Add some users above.': 'ユーザが見つかりません。上記でユーザを追加してください。',
+  'Actions': '操作',
   
   // Equipment Layout Page
   'Equipment Layout': '装置の配置',
@@ -60,10 +70,15 @@ const translations = {
   'Click on equipment name or time slot to make a reservation.': '装置名または時間帯をクリックして予約を行なってください。',
   
   // Reservation Window
+  'Reserve': '予約：',
   'Reserve Equipment': '装置を予約',
   'Select Time Slots': '時間帯を選択',
   'OK': '確定',
   'Cancel': 'キャンセル',
+  'Please select at least one time slot.': '少なくとも1つの時間枠を選択してください。',
+  'Failed to save reservation. Please try again.': '予約の保存に失敗しました。もう一度お試しください。',
+  'Saving...': '保存中...',
+  'Confirm Reservation': '予約を確定',
   
   // Common
   'Save': '保存',

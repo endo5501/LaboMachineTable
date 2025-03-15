@@ -14,16 +14,16 @@ function ReservationStatusPage() {
   const [showReservationWindow, setShowReservationWindow] = useState(false);
   const [userMap, setUserMap] = useState({});
 
-  // Generate time slots from 8:00 to 22:00 in 30-minute intervals
+  // Generate time slots from 0:00 to 23:30 in 30-minute intervals
   const timeSlots = [];
-  const startTime = parse('08:00', 'HH:mm', new Date());
-  const endTime = parse('22:00', 'HH:mm', new Date());
+  const startTime = parse('00:00', 'HH:mm', new Date());
+  const endTime = parse('23:30', 'HH:mm', new Date());
   
   let currentTime = startTime;
   while (currentTime <= endTime) {
     timeSlots.push({
       time: format(currentTime, 'HH:mm'),
-      label: format(currentTime, 'h:mm a')
+      label: format(currentTime, 'HH:mm')
     });
     currentTime = new Date(currentTime.getTime() + 30 * 60000); // Add 30 minutes
   }
@@ -213,7 +213,7 @@ function ReservationStatusPage() {
                             }}
                             onClick={() => handleEquipmentClick(item)}
                           >
-                            {reserved && username ? `${translate('Reserved by:')} ${username}` : (reserved ? '✓' : '')}
+                            {reserved && username ? username : (reserved ? '✓' : '')}
                           </td>
                         );
                       })}

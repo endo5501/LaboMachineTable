@@ -429,7 +429,7 @@ function EquipmentLayoutPage() {
               >
                 <div className="equipment-name">{item.name}</div>
                 {item.current_user && (
-                  <div className="user-name">{translate('In use by:')} {item.current_user}</div>
+                  <div className="user-name">{item.current_user}</div>
                 )}
                 {editMode && (
                   <div className="equipment-controls" style={{ marginTop: '4px', display: 'flex', justifyContent: 'center' }}>
