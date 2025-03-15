@@ -52,6 +52,7 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - ✅ Internationalization of UserManagementPage component
 - ✅ Internationalization of ReservationWindow component
 - ✅ Simplified user display by removing "予約者:" and "使用者:" prefixes
+- ✅ Modified ReservationStatusPage layout to display time slots vertically and equipment horizontally for improved readability
 
 ## Features In Progress
 

@@ -43,6 +43,7 @@ The LaboMachineTable project has progressed significantly in the implementation 
 - Removed "予約者:" and "使用者:" prefixes from ReservationStatusPage and EquipmentLayoutPage to show only usernames
 - Changed time display in ReservationWindow and ReservationStatusPage from 8:00-22:00 to 24-hour format (0:00-23:30)
 - Updated time display format from AM/PM to 24-hour format in reservation components
+- Modified ReservationStatusPage layout to display time slots vertically and equipment horizontally (previously time slots were horizontal and equipment vertical)
 
 ## Next Steps
 

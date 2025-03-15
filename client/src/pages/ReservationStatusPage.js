@@ -167,43 +167,41 @@ function ReservationStatusPage() {
               <thead>
                 <tr>
                   <th style={{ position: 'sticky', left: 0, backgroundColor: '#f8f9fa', zIndex: 1 }}>
-                    Equipment
+                    {translate('Time')}
                   </th>
-                  {timeSlots.map(slot => (
-                    <th key={slot.time}>{slot.label}</th>
+                  {equipment.map(item => (
+                    <th key={item.id}>{item.name}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {equipment.length === 0 ? (
+                {timeSlots.length === 0 || equipment.length === 0 ? (
                   <tr>
-                    <td colSpan={timeSlots.length + 1} style={{ textAlign: 'center' }}>
+                    <td colSpan={equipment.length + 1} style={{ textAlign: 'center' }}>
                       {translate('No data available')}
                     </td>
                   </tr>
                 ) : (
-                  equipment.map(item => (
-                    <tr key={item.id}>
+                  timeSlots.map(slot => (
+                    <tr key={slot.time}>
                       <td 
                         style={{ 
                           position: 'sticky', 
                           left: 0, 
                           backgroundColor: '#fff',
-                          fontWeight: 'bold',
-                          cursor: 'pointer'
+                          fontWeight: 'bold'
                         }}
-                        onClick={() => handleEquipmentClick(item)}
                       >
-                        {item.name}
+                        {slot.label}
                       </td>
-                      {timeSlots.map(slot => {
+                      {equipment.map(item => {
                         const reserved = isSlotReserved(item.id, slot);
                         const userId = getReservationUser(item.id, slot);
                         const username = userId ? userMap[userId] : null;
                         
                         return (
                           <td 
-                            key={`${item.id}-${slot.time}`}
+                            key={`${slot.time}-${item.id}`}
                             style={{ 
                               backgroundColor: reserved ? '#f8d7da' : '#ffffff',
                               cursor: 'pointer',
