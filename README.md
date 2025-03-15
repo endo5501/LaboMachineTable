@@ -9,7 +9,7 @@ LaboMachineTable is a web application designed to manage and streamline the rese
 - User management (add, edit, delete users)
 - Visual equipment layout representation
 - Calendar-based reservation system
-- Time slot selection (30-minute intervals from 8:00 to 22:00)
+- Time slot selection (30-minute intervals)
 - Conflict prevention for reservations
 
 ## Technology Stack

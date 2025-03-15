@@ -97,7 +97,7 @@ LaboMachineTable addresses these challenges by providing a centralized, visual, 
 
 ### Reservation System
 - Calendar-based reservation interface
-- 30-minute time slot increments from 8:00 to 22:00
+- 30-minute time slot increments
 - Toggle selection for time slots
 - Conflict prevention
 - Reservation confirmation and cancellation

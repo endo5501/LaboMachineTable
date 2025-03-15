@@ -30,7 +30,7 @@ The application will provide a complete solution for laboratory equipment reserv
 
 ### Reservation System
 - Visual equipment layout display with drag-and-drop functionality
-- Time-based reservation (30-minute intervals from 8:00 to 22:00)
+- Time-based reservation (30-minute intervals)
 - Reservation creation, modification, and cancellation
 - Conflict prevention
 - Date-based reservation view

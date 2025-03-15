@@ -124,7 +124,7 @@ The LaboMachineTable project has progressed significantly in the implementation 
    - Decision: Use a time-slot based selection interface
    - Rationale: Clear visual representation of available and booked times
    - Consideration: Mobile-friendly interaction for touch devices
-   - Implementation: ReservationWindow component with 30-minute time slots from 8:00 to 22:00
+   - Implementation: ReservationWindow component with 30-minute time slots
 
 3. **Navigation Structure**
    - Decision: Use a sidebar navigation with clear section indicators
