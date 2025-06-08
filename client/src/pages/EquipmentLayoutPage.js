@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from '../utils/axiosConfig';
 import ReservationWindow from '../components/ReservationWindow';
 import translate from '../utils/translate';
@@ -33,7 +33,7 @@ function EquipmentLayoutPage() {
       document.removeEventListener('mousemove', handleResizeMove);
       document.removeEventListener('mouseup', handleResizeEnd);
     };
-  }, []);
+  }, [handleResizeMove, handleResizeEnd]);
 
   const fetchData = async () => {
     try {
@@ -357,11 +357,17 @@ function EquipmentLayoutPage() {
   };
 
   const handleResizeStart = (e, equipmentId) => {
+    console.log('Resize start for equipment:', equipmentId); // Debug log
     e.stopPropagation();
     e.preventDefault();
     
     const equipmentLayout = layout.find(item => item.equipment_id === equipmentId);
-    if (!equipmentLayout) return;
+    if (!equipmentLayout) {
+      console.log('Equipment layout not found'); // Debug log
+      return;
+    }
+    
+    console.log('Equipment layout:', equipmentLayout); // Debug log
     
     setResizingEquipment(equipmentId);
     setResizeStartData({
@@ -376,14 +382,18 @@ function EquipmentLayoutPage() {
     document.addEventListener('mouseup', handleResizeEnd);
   };
 
-  const handleResizeMove = (e) => {
+  const handleResizeMove = useCallback((e) => {
     if (!resizingEquipment || !resizeStartData) return;
+    
+    console.log('Resize move:', e.clientX, e.clientY); // Debug log
     
     const deltaX = e.clientX - resizeStartData.startX;
     const deltaY = e.clientY - resizeStartData.startY;
     
     const newWidth = resizeStartData.startWidth + deltaX;
     const newHeight = resizeStartData.startHeight + deltaY;
+    
+    console.log('New size:', newWidth, newHeight); // Debug log
     
     // Update local state immediately for visual feedback
     setLayout(prevLayout => 
@@ -393,9 +403,11 @@ function EquipmentLayoutPage() {
           : item
       )
     );
-  };
+  }, [resizingEquipment, resizeStartData]);
 
-  const handleResizeEnd = () => {
+  const handleResizeEnd = useCallback(() => {
+    console.log('Resize end'); // Debug log
+    
     if (resizingEquipment && resizeStartData) {
       const equipmentLayout = layout.find(item => item.equipment_id === resizingEquipment);
       if (equipmentLayout) {
@@ -409,7 +421,7 @@ function EquipmentLayoutPage() {
     // Remove event listeners
     document.removeEventListener('mousemove', handleResizeMove);
     document.removeEventListener('mouseup', handleResizeEnd);
-  };
+  }, [resizingEquipment, resizeStartData, layout]);
 
   const getEquipmentPosition = (equipmentId) => {
     const equipmentLayout = layout.find(item => item.equipment_id === equipmentId);
@@ -565,7 +577,7 @@ function EquipmentLayoutPage() {
                   cursor: editMode ? 'move' : 'pointer'
                 }}
                 onClick={() => handleEquipmentClick(item)}
-                draggable={editMode}
+                draggable={editMode && !resizingEquipment}
                 onDragStart={(e) => handleDragStart(e, item.id)}
               >
                 <div className="equipment-name">{item.name}</div>
@@ -599,6 +611,7 @@ function EquipmentLayoutPage() {
                         borderRadius: '0 0 4px 0',
                         border: '1px solid #0056b3'
                       }}
+                      draggable={false}
                       onMouseDown={(e) => handleResizeStart(e, item.id)}
                     />
                   </>
