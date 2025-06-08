@@ -398,14 +398,70 @@ function EquipmentLayoutPage() {
         {loading ? (
           <p>Loading equipment layout...</p>
         ) : (
-          <div 
-            ref={layoutContainerRef}
-            className="layout-container"
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-            onDoubleClick={handleLayoutDoubleClick}
-            style={{ position: 'relative', minHeight: '600px' }}
-          >
+          <div style={{ display: 'flex', gap: '20px' }}>
+            {/* Sidebar for unpositioned equipment */}
+            {editMode && unpositionedEquipment.length > 0 && (
+              <div className="equipment-sidebar" style={{
+                width: '250px',
+                backgroundColor: '#f8f9fa',
+                border: '1px solid #dee2e6',
+                borderRadius: '8px',
+                padding: '15px',
+                height: 'fit-content',
+                maxHeight: '600px',
+                overflowY: 'auto'
+              }}>
+                <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#495057' }}>
+                  {translate('Equipment Palette')}
+                </h4>
+                <p style={{ margin: '0 0 15px 0', fontSize: '12px', color: '#6c757d' }}>
+                  {translate('Drag items to the layout')}
+                </p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {unpositionedEquipment.map(item => (
+                    <div
+                      key={item.id}
+                      className="equipment-item"
+                      style={{ 
+                        width: '100%', 
+                        height: '60px',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #dee2e6',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'grab',
+                        fontSize: '14px',
+                        textAlign: 'center',
+                        padding: '8px'
+                      }}
+                      draggable
+                      onDragStart={(e) => handleDragStart(e, item.id)}
+                    >
+                      <div className="equipment-name">{item.name}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Main layout area */}
+            <div 
+              ref={layoutContainerRef}
+              className="layout-container"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+              onDoubleClick={handleLayoutDoubleClick}
+              style={{ 
+                position: 'relative', 
+                minHeight: '600px',
+                flex: 1,
+                border: '1px solid #dee2e6',
+                borderRadius: '8px',
+                backgroundColor: '#ffffff'
+              }}
+            >
             {/* Equipment items */}
             {positionedEquipment.map(item => (
               <div
@@ -534,28 +590,7 @@ function EquipmentLayoutPage() {
                 </form>
               </div>
             )}
-            
-            {editMode && unpositionedEquipment.length > 0 && (
-              <div className="card" style={{ marginTop: '20px' }}>
-                <div className="card-header">
-                  <h4>Unpositioned Equipment</h4>
-                  <p>Drag these items to position them on the layout</p>
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', padding: '10px' }}>
-                  {unpositionedEquipment.map(item => (
-                    <div
-                      key={item.id}
-                      className="equipment-item"
-                      style={{ width: '150px', height: '100px' }}
-                      draggable
-                      onDragStart={(e) => handleDragStart(e, item.id)}
-                    >
-                      <div className="equipment-name">{item.name}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            </div>
           </div>
         )}
       </div>

@@ -57,6 +57,8 @@ const translations = {
   'Remove Equipment': '装置を削除',
   'Enter text:': 'テキストを入力:',
   'Double-click to add text': 'ダブルクリックでテキストを追加',
+  'Equipment Palette': '装置パレット',
+  'Drag items to the layout': 'アイテムをレイアウトにドラッグ',
   
   // Reservation Status Page
   'Reservation Status': '予約状況',
