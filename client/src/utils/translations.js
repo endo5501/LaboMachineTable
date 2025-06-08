@@ -97,6 +97,7 @@ const translations = {
   'Failed to remove equipment from layout. Please try again.': 'レイアウトからの装置削除に失敗しました。もう一度お試しください。',
   'Failed to save layout. Please try again.': 'レイアウトの保存に失敗しました。もう一度お試しください。',
   'Failed to load existing reservations. Please try again.': '既存の予約の読み込みに失敗しました。もう一度お試しください。',
+  'Failed to update equipment size. Please try again.': '装置サイズの更新に失敗しました。もう一度お試しください。',
   
   // Common
   'Save': '保存',

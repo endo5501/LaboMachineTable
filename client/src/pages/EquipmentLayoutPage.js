@@ -19,10 +19,20 @@ function EquipmentLayoutPage() {
   const [textInputValue, setTextInputValue] = useState('');
   const [editingLabelId, setEditingLabelId] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [resizingEquipment, setResizingEquipment] = useState(null);
+  const [resizeStartData, setResizeStartData] = useState(null);
   const layoutContainerRef = useRef(null);
 
   useEffect(() => {
     fetchData();
+  }, []);
+
+  // Cleanup event listeners on unmount
+  useEffect(() => {
+    return () => {
+      document.removeEventListener('mousemove', handleResizeMove);
+      document.removeEventListener('mouseup', handleResizeEnd);
+    };
   }, []);
 
   const fetchData = async () => {
@@ -187,6 +197,33 @@ function EquipmentLayoutPage() {
     }
   };
 
+  const updateEquipmentSize = async (equipmentId, width, height) => {
+    try {
+      // Find existing layout for this equipment
+      const existingLayout = layout.find(item => item.equipment_id === equipmentId);
+      
+      if (existingLayout) {
+        // Update existing layout size
+        const updatedLayout = {
+          ...existingLayout,
+          width: Math.max(50, width), // Minimum width of 50px
+          height: Math.max(30, height) // Minimum height of 30px
+        };
+        
+        await axios.put(`/api/layout/equipment/${equipmentId}`, updatedLayout);
+        
+        // Update local state immediately for better UX
+        setLayout(prevLayout => 
+          prevLayout.map(item => 
+            item.equipment_id === equipmentId ? updatedLayout : item
+          )
+        );
+      }
+    } catch (err) {
+      setError(translate('Failed to update equipment size. Please try again.'));
+    }
+  };
+
   const updateTextLabelPosition = async (labelId, x, y) => {
     try {
       await axios.put(`/api/layout/labels/${labelId}`, {
@@ -317,6 +354,61 @@ function EquipmentLayoutPage() {
     } catch (err) {
       setError(translate('Failed to save layout. Please try again.'));
     }
+  };
+
+  const handleResizeStart = (e, equipmentId) => {
+    e.stopPropagation();
+    e.preventDefault();
+    
+    const equipmentLayout = layout.find(item => item.equipment_id === equipmentId);
+    if (!equipmentLayout) return;
+    
+    setResizingEquipment(equipmentId);
+    setResizeStartData({
+      startX: e.clientX,
+      startY: e.clientY,
+      startWidth: equipmentLayout.width,
+      startHeight: equipmentLayout.height
+    });
+    
+    // Add event listeners for mouse move and up
+    document.addEventListener('mousemove', handleResizeMove);
+    document.addEventListener('mouseup', handleResizeEnd);
+  };
+
+  const handleResizeMove = (e) => {
+    if (!resizingEquipment || !resizeStartData) return;
+    
+    const deltaX = e.clientX - resizeStartData.startX;
+    const deltaY = e.clientY - resizeStartData.startY;
+    
+    const newWidth = resizeStartData.startWidth + deltaX;
+    const newHeight = resizeStartData.startHeight + deltaY;
+    
+    // Update local state immediately for visual feedback
+    setLayout(prevLayout => 
+      prevLayout.map(item => 
+        item.equipment_id === resizingEquipment 
+          ? { ...item, width: Math.max(50, newWidth), height: Math.max(30, newHeight) }
+          : item
+      )
+    );
+  };
+
+  const handleResizeEnd = () => {
+    if (resizingEquipment && resizeStartData) {
+      const equipmentLayout = layout.find(item => item.equipment_id === resizingEquipment);
+      if (equipmentLayout) {
+        updateEquipmentSize(resizingEquipment, equipmentLayout.width, equipmentLayout.height);
+      }
+    }
+    
+    setResizingEquipment(null);
+    setResizeStartData(null);
+    
+    // Remove event listeners
+    document.removeEventListener('mousemove', handleResizeMove);
+    document.removeEventListener('mouseup', handleResizeEnd);
   };
 
   const getEquipmentPosition = (equipmentId) => {
@@ -481,17 +573,35 @@ function EquipmentLayoutPage() {
                   <div className="user-name">{item.current_user}</div>
                 )}
                 {editMode && (
-                  <div className="equipment-controls" style={{ marginTop: '4px', display: 'flex', justifyContent: 'center' }}>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeEquipmentFromLayout(item.id);
+                  <>
+                    <div className="equipment-controls" style={{ marginTop: '4px', display: 'flex', justifyContent: 'center' }}>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeEquipmentFromLayout(item.id);
+                        }}
+                        style={{ fontSize: '12px', padding: '2px 4px', backgroundColor: '#dc3545', color: 'white' }}
+                      >
+                        {translate('Remove Equipment')}
+                      </button>
+                    </div>
+                    {/* Resize handle */}
+                    <div
+                      className="resize-handle"
+                      style={{
+                        position: 'absolute',
+                        bottom: '0px',
+                        right: '0px',
+                        width: '12px',
+                        height: '12px',
+                        backgroundColor: '#007bff',
+                        cursor: 'se-resize',
+                        borderRadius: '0 0 4px 0',
+                        border: '1px solid #0056b3'
                       }}
-                      style={{ fontSize: '12px', padding: '2px 4px', backgroundColor: '#dc3545', color: 'white' }}
-                    >
-                      {translate('Remove Equipment')}
-                    </button>
-                  </div>
+                      onMouseDown={(e) => handleResizeStart(e, item.id)}
+                    />
+                  </>
                 )}
               </div>
             ))}
