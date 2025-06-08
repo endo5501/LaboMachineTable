@@ -22,6 +22,7 @@ function EquipmentLayoutPage() {
   const [resizingEquipment, setResizingEquipment] = useState(null);
   const [resizeStartData, setResizeStartData] = useState(null);
   const layoutContainerRef = useRef(null);
+  const resizeFunctionsRef = useRef({});
 
   useEffect(() => {
     fetchData();
@@ -30,10 +31,14 @@ function EquipmentLayoutPage() {
   // Cleanup event listeners on unmount
   useEffect(() => {
     return () => {
-      document.removeEventListener('mousemove', handleResizeMove);
-      document.removeEventListener('mouseup', handleResizeEnd);
+      if (resizeFunctionsRef.current.handleResizeMove) {
+        document.removeEventListener('mousemove', resizeFunctionsRef.current.handleResizeMove);
+      }
+      if (resizeFunctionsRef.current.handleResizeEnd) {
+        document.removeEventListener('mouseup', resizeFunctionsRef.current.handleResizeEnd);
+      }
     };
-  }, [handleResizeMove, handleResizeEnd]);
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -356,6 +361,51 @@ function EquipmentLayoutPage() {
     }
   };
 
+  const handleResizeMove = (e) => {
+    if (!resizingEquipment || !resizeStartData) return;
+    
+    console.log('Resize move:', e.clientX, e.clientY); // Debug log
+    
+    const deltaX = e.clientX - resizeStartData.startX;
+    const deltaY = e.clientY - resizeStartData.startY;
+    
+    const newWidth = resizeStartData.startWidth + deltaX;
+    const newHeight = resizeStartData.startHeight + deltaY;
+    
+    console.log('New size:', newWidth, newHeight); // Debug log
+    
+    // Update local state immediately for visual feedback
+    setLayout(prevLayout => 
+      prevLayout.map(item => 
+        item.equipment_id === resizingEquipment 
+          ? { ...item, width: Math.max(50, newWidth), height: Math.max(30, newHeight) }
+          : item
+      )
+    );
+  };
+
+  const handleResizeEnd = () => {
+    console.log('Resize end'); // Debug log
+    
+    if (resizingEquipment && resizeStartData) {
+      const equipmentLayout = layout.find(item => item.equipment_id === resizingEquipment);
+      if (equipmentLayout) {
+        updateEquipmentSize(resizingEquipment, equipmentLayout.width, equipmentLayout.height);
+      }
+    }
+    
+    setResizingEquipment(null);
+    setResizeStartData(null);
+    
+    // Remove event listeners
+    document.removeEventListener('mousemove', resizeFunctionsRef.current.handleResizeMove);
+    document.removeEventListener('mouseup', resizeFunctionsRef.current.handleResizeEnd);
+  };
+
+  // Store function references
+  resizeFunctionsRef.current.handleResizeMove = handleResizeMove;
+  resizeFunctionsRef.current.handleResizeEnd = handleResizeEnd;
+
   const handleResizeStart = (e, equipmentId) => {
     console.log('Resize start for equipment:', equipmentId); // Debug log
     e.stopPropagation();
@@ -378,50 +428,9 @@ function EquipmentLayoutPage() {
     });
     
     // Add event listeners for mouse move and up
-    document.addEventListener('mousemove', handleResizeMove);
-    document.addEventListener('mouseup', handleResizeEnd);
+    document.addEventListener('mousemove', resizeFunctionsRef.current.handleResizeMove);
+    document.addEventListener('mouseup', resizeFunctionsRef.current.handleResizeEnd);
   };
-
-  const handleResizeMove = useCallback((e) => {
-    if (!resizingEquipment || !resizeStartData) return;
-    
-    console.log('Resize move:', e.clientX, e.clientY); // Debug log
-    
-    const deltaX = e.clientX - resizeStartData.startX;
-    const deltaY = e.clientY - resizeStartData.startY;
-    
-    const newWidth = resizeStartData.startWidth + deltaX;
-    const newHeight = resizeStartData.startHeight + deltaY;
-    
-    console.log('New size:', newWidth, newHeight); // Debug log
-    
-    // Update local state immediately for visual feedback
-    setLayout(prevLayout => 
-      prevLayout.map(item => 
-        item.equipment_id === resizingEquipment 
-          ? { ...item, width: Math.max(50, newWidth), height: Math.max(30, newHeight) }
-          : item
-      )
-    );
-  }, [resizingEquipment, resizeStartData]);
-
-  const handleResizeEnd = useCallback(() => {
-    console.log('Resize end'); // Debug log
-    
-    if (resizingEquipment && resizeStartData) {
-      const equipmentLayout = layout.find(item => item.equipment_id === resizingEquipment);
-      if (equipmentLayout) {
-        updateEquipmentSize(resizingEquipment, equipmentLayout.width, equipmentLayout.height);
-      }
-    }
-    
-    setResizingEquipment(null);
-    setResizeStartData(null);
-    
-    // Remove event listeners
-    document.removeEventListener('mousemove', handleResizeMove);
-    document.removeEventListener('mouseup', handleResizeEnd);
-  }, [resizingEquipment, resizeStartData, layout]);
 
   const getEquipmentPosition = (equipmentId) => {
     const equipmentLayout = layout.find(item => item.equipment_id === equipmentId);
