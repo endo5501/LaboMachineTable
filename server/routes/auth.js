@@ -29,7 +29,14 @@ router.post('/login', async (req, res) => {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
     } else {
-      // User doesn't exist, create new user
+      // Check if auto-registration is enabled
+      const autoRegisterEnabled = process.env.ENABLE_AUTO_REGISTRATION === 'true';
+      
+      if (!autoRegisterEnabled) {
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+      
+      // User doesn't exist, create new user (only if auto-registration is enabled)
       const hashedPassword = await hashPassword(password);
       
       const result = await run(
@@ -54,7 +61,6 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Login error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -68,7 +74,6 @@ router.get('/me', authenticate, async (req, res) => {
   try {
     res.json(req.user);
   } catch (err) {
-    console.error('Get current user error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
