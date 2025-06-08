@@ -23,6 +23,7 @@ function EquipmentLayoutPage() {
   const [resizeStartData, setResizeStartData] = useState(null);
   const layoutContainerRef = useRef(null);
   const resizeFunctionsRef = useRef({});
+  const resizeDataRef = useRef({ equipmentId: null, startData: null });
 
   useEffect(() => {
     fetchData();
@@ -371,26 +372,30 @@ function EquipmentLayoutPage() {
     console.log('Resize move called'); // Debug log - first check
     console.log('resizingEquipment:', resizingEquipment); // Debug log
     console.log('resizeStartData:', resizeStartData); // Debug log
+    console.log('resizeDataRef.current:', resizeDataRef.current); // Debug log
     
-    if (!resizingEquipment || !resizeStartData) {
-      console.log('Early return - missing data'); // Debug log
+    const currentEquipmentId = resizeDataRef.current.equipmentId;
+    const currentStartData = resizeDataRef.current.startData;
+    
+    if (!currentEquipmentId || !currentStartData) {
+      console.log('Early return - missing data from ref'); // Debug log
       return;
     }
     
     console.log('Resize move:', e.clientX, e.clientY); // Debug log
     
-    const deltaX = e.clientX - resizeStartData.startX;
-    const deltaY = e.clientY - resizeStartData.startY;
+    const deltaX = e.clientX - currentStartData.startX;
+    const deltaY = e.clientY - currentStartData.startY;
     
-    const newWidth = resizeStartData.startWidth + deltaX;
-    const newHeight = resizeStartData.startHeight + deltaY;
+    const newWidth = currentStartData.startWidth + deltaX;
+    const newHeight = currentStartData.startHeight + deltaY;
     
     console.log('New size:', newWidth, newHeight); // Debug log
     
     // Update local state immediately for visual feedback
     setLayout(prevLayout => 
       prevLayout.map(item => 
-        item.equipment_id === resizingEquipment 
+        item.equipment_id === currentEquipmentId 
           ? { ...item, width: Math.max(50, newWidth), height: Math.max(30, newHeight) }
           : item
       )
@@ -400,13 +405,17 @@ function EquipmentLayoutPage() {
   const handleResizeEnd = () => {
     console.log('Resize end'); // Debug log
     
-    if (resizingEquipment && resizeStartData) {
-      const equipmentLayout = layout.find(item => item.equipment_id === resizingEquipment);
+    const currentEquipmentId = resizeDataRef.current.equipmentId;
+    
+    if (currentEquipmentId) {
+      const equipmentLayout = layout.find(item => item.equipment_id === currentEquipmentId);
       if (equipmentLayout) {
-        updateEquipmentSize(resizingEquipment, equipmentLayout.width, equipmentLayout.height);
+        updateEquipmentSize(currentEquipmentId, equipmentLayout.width, equipmentLayout.height);
       }
     }
     
+    // Clear refs and state
+    resizeDataRef.current = { equipmentId: null, startData: null };
     setResizingEquipment(null);
     setResizeStartData(null);
     
@@ -428,13 +437,19 @@ function EquipmentLayoutPage() {
     
     console.log('Equipment layout:', equipmentLayout); // Debug log
     
-    setResizingEquipment(equipmentId);
-    setResizeStartData({
+    const startData = {
       startX: e.clientX,
       startY: e.clientY,
       startWidth: equipmentLayout.width,
       startHeight: equipmentLayout.height
-    });
+    };
+    
+    // Set both state and ref immediately
+    setResizingEquipment(equipmentId);
+    setResizeStartData(startData);
+    resizeDataRef.current = { equipmentId, startData };
+    
+    console.log('Set resizeDataRef.current to:', resizeDataRef.current); // Debug log
     
     // Add event listeners for mouse move and up
     console.log('Adding event listeners'); // Debug log
