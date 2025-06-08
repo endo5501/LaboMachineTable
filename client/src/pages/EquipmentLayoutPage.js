@@ -23,7 +23,7 @@ function EquipmentLayoutPage() {
   const [resizeStartData, setResizeStartData] = useState(null);
   const layoutContainerRef = useRef(null);
   const resizeFunctionsRef = useRef({});
-  const resizeDataRef = useRef({ equipmentId: null, startData: null });
+  const resizeDataRef = useRef({ equipmentId: null, startData: null, currentSize: null });
 
   useEffect(() => {
     fetchData();
@@ -210,9 +210,11 @@ function EquipmentLayoutPage() {
   };
 
   const updateEquipmentSize = async (equipmentId, width, height) => {
+    console.log('updateEquipmentSize called:', { equipmentId, width, height }); // Debug log
     try {
       // Find existing layout for this equipment
       const existingLayout = layout.find(item => item.equipment_id === equipmentId);
+      console.log('existingLayout found:', existingLayout); // Debug log
       
       if (existingLayout) {
         // Update existing layout size
@@ -222,7 +224,10 @@ function EquipmentLayoutPage() {
           height: Math.max(30, height) // Minimum height of 30px
         };
         
-        await axios.put(`/api/layout/equipment/${equipmentId}`, updatedLayout);
+        console.log('Sending update to server:', updatedLayout); // Debug log
+        
+        const response = await axios.put(`/api/layout/equipment/${equipmentId}`, updatedLayout);
+        console.log('Server response:', response.data); // Debug log
         
         // Update local state immediately for better UX
         setLayout(prevLayout => 
@@ -230,8 +235,13 @@ function EquipmentLayoutPage() {
             item.equipment_id === equipmentId ? updatedLayout : item
           )
         );
+        
+        console.log('Local state updated'); // Debug log
+      } else {
+        console.log('No existing layout found for equipment:', equipmentId); // Debug log
       }
     } catch (err) {
+      console.error('updateEquipmentSize error:', err); // Debug log
       setError(translate('Failed to update equipment size. Please try again.'));
     }
   };
@@ -387,16 +397,19 @@ function EquipmentLayoutPage() {
     const deltaX = e.clientX - currentStartData.startX;
     const deltaY = e.clientY - currentStartData.startY;
     
-    const newWidth = currentStartData.startWidth + deltaX;
-    const newHeight = currentStartData.startHeight + deltaY;
+    const newWidth = Math.max(50, currentStartData.startWidth + deltaX);
+    const newHeight = Math.max(30, currentStartData.startHeight + deltaY);
     
     console.log('New size:', newWidth, newHeight); // Debug log
+    
+    // Store current size in ref
+    resizeDataRef.current.currentSize = { width: newWidth, height: newHeight };
     
     // Update local state immediately for visual feedback
     setLayout(prevLayout => 
       prevLayout.map(item => 
         item.equipment_id === currentEquipmentId 
-          ? { ...item, width: Math.max(50, newWidth), height: Math.max(30, newHeight) }
+          ? { ...item, width: newWidth, height: newHeight }
           : item
       )
     );
@@ -406,16 +419,17 @@ function EquipmentLayoutPage() {
     console.log('Resize end'); // Debug log
     
     const currentEquipmentId = resizeDataRef.current.equipmentId;
+    const currentSize = resizeDataRef.current.currentSize;
     
-    if (currentEquipmentId) {
-      const equipmentLayout = layout.find(item => item.equipment_id === currentEquipmentId);
-      if (equipmentLayout) {
-        updateEquipmentSize(currentEquipmentId, equipmentLayout.width, equipmentLayout.height);
-      }
+    console.log('handleResizeEnd data:', { currentEquipmentId, currentSize }); // Debug log
+    
+    if (currentEquipmentId && currentSize) {
+      console.log('Calling updateEquipmentSize with final size:', currentSize); // Debug log
+      updateEquipmentSize(currentEquipmentId, currentSize.width, currentSize.height);
     }
     
     // Clear refs and state
-    resizeDataRef.current = { equipmentId: null, startData: null };
+    resizeDataRef.current = { equipmentId: null, startData: null, currentSize: null };
     setResizingEquipment(null);
     setResizeStartData(null);
     
@@ -447,7 +461,11 @@ function EquipmentLayoutPage() {
     // Set both state and ref immediately
     setResizingEquipment(equipmentId);
     setResizeStartData(startData);
-    resizeDataRef.current = { equipmentId, startData };
+    resizeDataRef.current = { 
+      equipmentId, 
+      startData,
+      currentSize: { width: equipmentLayout.width, height: equipmentLayout.height }
+    };
     
     console.log('Set resizeDataRef.current to:', resizeDataRef.current); // Debug log
     
