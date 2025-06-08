@@ -77,7 +77,6 @@ function EquipmentLayoutPage() {
       setTextLabels(textLabelsResponse.data);
       setError('');
     } catch (err) {
-      console.error('Error fetching data:', err);
       setError('Failed to load equipment layout. Please try again later.');
     } finally {
       setLoading(false);
@@ -184,7 +183,6 @@ function EquipmentLayoutPage() {
       // Refresh layout data
       fetchData();
     } catch (err) {
-      console.error('Error updating equipment position:', err);
       setError('Failed to update equipment position. Please try again.');
     }
   };
@@ -199,7 +197,6 @@ function EquipmentLayoutPage() {
       // Refresh data
       fetchData();
     } catch (err) {
-      console.error('Error updating text label position:', err);
       setError('Failed to update text label position. Please try again.');
     }
   };
@@ -284,7 +281,6 @@ function EquipmentLayoutPage() {
       setEditingLabelId(null);
       fetchData();
     } catch (err) {
-      console.error('Error saving text label:', err);
       setError('Failed to save text label. Please try again.');
     }
   };
@@ -300,7 +296,6 @@ function EquipmentLayoutPage() {
       await axios.delete(`/api/layout/labels/${labelId}`);
       fetchData();
     } catch (err) {
-      console.error('Error deleting text label:', err);
       setError('Failed to delete text label. Please try again.');
     }
   };
@@ -310,7 +305,6 @@ function EquipmentLayoutPage() {
       await axios.delete(`/api/layout/equipment/${equipmentId}`);
       fetchData();
     } catch (err) {
-      console.error('Error removing equipment from layout:', err);
       setError('Failed to remove equipment from layout. Please try again.');
     }
   };
@@ -321,7 +315,6 @@ function EquipmentLayoutPage() {
       setEditMode(false);
       fetchData();
     } catch (err) {
-      console.error('Error saving layout:', err);
       setError('Failed to save layout. Please try again.');
     }
   };

@@ -24,7 +24,6 @@ function EquipmentManagementPage() {
       setEquipment(response.data);
       setError('');
     } catch (err) {
-      console.error('Error fetching equipment:', err);
       setError(translate('Failed to load equipment. Please try again later.'));
     } finally {
       setLoading(false);
@@ -54,7 +53,6 @@ function EquipmentManagementPage() {
       setEditingId(null);
       fetchEquipment();
     } catch (err) {
-      console.error('Error saving equipment:', err);
       setError(translate('Failed to save equipment. Please try again.'));
     }
   };
@@ -77,7 +75,6 @@ function EquipmentManagementPage() {
       await axios.delete(`/api/equipment/${id}`);
       fetchEquipment();
     } catch (err) {
-      console.error('Error deleting equipment:', err);
       setError(translate('Failed to delete equipment. Please try again.'));
     }
   };

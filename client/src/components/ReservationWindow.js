@@ -38,7 +38,6 @@ function ReservationWindow({ equipment, onClose }) {
       const response = await axios.get(`/api/reservations/equipment/${equipment.id}`);
       setExistingReservations(response.data);
     } catch (err) {
-      console.error('Error fetching reservations:', err);
       setError('Failed to load existing reservations. Please try again.');
     } finally {
       setLoading(false);
@@ -113,7 +112,6 @@ function ReservationWindow({ equipment, onClose }) {
       // Close the reservation window
       onClose();
     } catch (err) {
-      console.error('Error saving reservation:', err);
       setError(translate('Failed to save reservation. Please try again.'));
       setSaving(false);
     }

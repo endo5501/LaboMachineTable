@@ -27,7 +27,6 @@ function UserManagementPage() {
       setUsers(response.data);
       setError('');
     } catch (err) {
-      console.error('Error fetching users:', err);
       setError(translate('Failed to load users. Please try again later.'));
     } finally {
       setLoading(false);
@@ -62,7 +61,6 @@ function UserManagementPage() {
       setEditingId(null);
       fetchUsers();
     } catch (err) {
-      console.error('Error saving user:', err);
       setError(translate('Failed to save user. Please try again.'));
     }
   };
@@ -92,7 +90,6 @@ function UserManagementPage() {
       await axios.delete(`/api/users/${id}`);
       fetchUsers();
     } catch (err) {
-      console.error('Error deleting user:', err);
       setError(translate('Failed to delete user. Please try again.'));
     }
   };
