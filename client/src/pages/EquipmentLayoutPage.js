@@ -28,6 +28,12 @@ function EquipmentLayoutPage() {
     fetchData();
   }, []);
 
+  // Store function references
+  useEffect(() => {
+    resizeFunctionsRef.current.handleResizeMove = handleResizeMove;
+    resizeFunctionsRef.current.handleResizeEnd = handleResizeEnd;
+  });
+
   // Cleanup event listeners on unmount
   useEffect(() => {
     return () => {
@@ -362,7 +368,14 @@ function EquipmentLayoutPage() {
   };
 
   const handleResizeMove = (e) => {
-    if (!resizingEquipment || !resizeStartData) return;
+    console.log('Resize move called'); // Debug log - first check
+    console.log('resizingEquipment:', resizingEquipment); // Debug log
+    console.log('resizeStartData:', resizeStartData); // Debug log
+    
+    if (!resizingEquipment || !resizeStartData) {
+      console.log('Early return - missing data'); // Debug log
+      return;
+    }
     
     console.log('Resize move:', e.clientX, e.clientY); // Debug log
     
@@ -402,10 +415,6 @@ function EquipmentLayoutPage() {
     document.removeEventListener('mouseup', resizeFunctionsRef.current.handleResizeEnd);
   };
 
-  // Store function references
-  resizeFunctionsRef.current.handleResizeMove = handleResizeMove;
-  resizeFunctionsRef.current.handleResizeEnd = handleResizeEnd;
-
   const handleResizeStart = (e, equipmentId) => {
     console.log('Resize start for equipment:', equipmentId); // Debug log
     e.stopPropagation();
@@ -428,8 +437,11 @@ function EquipmentLayoutPage() {
     });
     
     // Add event listeners for mouse move and up
+    console.log('Adding event listeners'); // Debug log
+    console.log('resizeFunctionsRef.current:', resizeFunctionsRef.current); // Debug log
     document.addEventListener('mousemove', resizeFunctionsRef.current.handleResizeMove);
     document.addEventListener('mouseup', resizeFunctionsRef.current.handleResizeEnd);
+    console.log('Event listeners added'); // Debug log
   };
 
   const getEquipmentPosition = (equipmentId) => {
