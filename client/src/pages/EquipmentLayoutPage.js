@@ -210,11 +210,9 @@ function EquipmentLayoutPage() {
   };
 
   const updateEquipmentSize = async (equipmentId, width, height) => {
-    console.log('updateEquipmentSize called:', { equipmentId, width, height }); // Debug log
     try {
       // Find existing layout for this equipment
       const existingLayout = layout.find(item => item.equipment_id === equipmentId);
-      console.log('existingLayout found:', existingLayout); // Debug log
       
       if (existingLayout) {
         // Update existing layout size
@@ -224,10 +222,7 @@ function EquipmentLayoutPage() {
           height: Math.max(30, height) // Minimum height of 30px
         };
         
-        console.log('Sending update to server:', updatedLayout); // Debug log
-        
-        const response = await axios.put(`/api/layout/equipment/${equipmentId}`, updatedLayout);
-        console.log('Server response:', response.data); // Debug log
+        await axios.put(`/api/layout/equipment/${equipmentId}`, updatedLayout);
         
         // Update local state immediately for better UX
         setLayout(prevLayout => 
@@ -235,13 +230,8 @@ function EquipmentLayoutPage() {
             item.equipment_id === equipmentId ? updatedLayout : item
           )
         );
-        
-        console.log('Local state updated'); // Debug log
-      } else {
-        console.log('No existing layout found for equipment:', equipmentId); // Debug log
       }
     } catch (err) {
-      console.error('updateEquipmentSize error:', err); // Debug log
       setError(translate('Failed to update equipment size. Please try again.'));
     }
   };
@@ -379,28 +369,18 @@ function EquipmentLayoutPage() {
   };
 
   const handleResizeMove = (e) => {
-    console.log('Resize move called'); // Debug log - first check
-    console.log('resizingEquipment:', resizingEquipment); // Debug log
-    console.log('resizeStartData:', resizeStartData); // Debug log
-    console.log('resizeDataRef.current:', resizeDataRef.current); // Debug log
-    
     const currentEquipmentId = resizeDataRef.current.equipmentId;
     const currentStartData = resizeDataRef.current.startData;
     
     if (!currentEquipmentId || !currentStartData) {
-      console.log('Early return - missing data from ref'); // Debug log
       return;
     }
-    
-    console.log('Resize move:', e.clientX, e.clientY); // Debug log
     
     const deltaX = e.clientX - currentStartData.startX;
     const deltaY = e.clientY - currentStartData.startY;
     
     const newWidth = Math.max(50, currentStartData.startWidth + deltaX);
     const newHeight = Math.max(30, currentStartData.startHeight + deltaY);
-    
-    console.log('New size:', newWidth, newHeight); // Debug log
     
     // Store current size in ref
     resizeDataRef.current.currentSize = { width: newWidth, height: newHeight };
@@ -416,15 +396,10 @@ function EquipmentLayoutPage() {
   };
 
   const handleResizeEnd = () => {
-    console.log('Resize end'); // Debug log
-    
     const currentEquipmentId = resizeDataRef.current.equipmentId;
     const currentSize = resizeDataRef.current.currentSize;
     
-    console.log('handleResizeEnd data:', { currentEquipmentId, currentSize }); // Debug log
-    
     if (currentEquipmentId && currentSize) {
-      console.log('Calling updateEquipmentSize with final size:', currentSize); // Debug log
       updateEquipmentSize(currentEquipmentId, currentSize.width, currentSize.height);
     }
     
@@ -439,17 +414,13 @@ function EquipmentLayoutPage() {
   };
 
   const handleResizeStart = (e, equipmentId) => {
-    console.log('Resize start for equipment:', equipmentId); // Debug log
     e.stopPropagation();
     e.preventDefault();
     
     const equipmentLayout = layout.find(item => item.equipment_id === equipmentId);
     if (!equipmentLayout) {
-      console.log('Equipment layout not found'); // Debug log
       return;
     }
-    
-    console.log('Equipment layout:', equipmentLayout); // Debug log
     
     const startData = {
       startX: e.clientX,
@@ -467,14 +438,9 @@ function EquipmentLayoutPage() {
       currentSize: { width: equipmentLayout.width, height: equipmentLayout.height }
     };
     
-    console.log('Set resizeDataRef.current to:', resizeDataRef.current); // Debug log
-    
     // Add event listeners for mouse move and up
-    console.log('Adding event listeners'); // Debug log
-    console.log('resizeFunctionsRef.current:', resizeFunctionsRef.current); // Debug log
     document.addEventListener('mousemove', resizeFunctionsRef.current.handleResizeMove);
     document.addEventListener('mouseup', resizeFunctionsRef.current.handleResizeEnd);
-    console.log('Event listeners added'); // Debug log
   };
 
   const getEquipmentPosition = (equipmentId) => {
