@@ -30,7 +30,6 @@ export function AuthProvider({ children }) {
       setCurrentUser(response.data);
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching current user:', err);
       logout();
       setLoading(false);
     }
@@ -39,36 +38,8 @@ export function AuthProvider({ children }) {
   const login = async (username, password) => {
     try {
       setError('');
-      console.log('Attempting to login with:', { username, password });
-      console.log('Login URL:', '/api/auth/login');
-      
-      // Add a direct fetch to the server to see if it works
-      try {
-        const directResponse = await fetch('http://localhost:5001/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ username, password }),
-        });
-        console.log('Direct fetch response:', directResponse);
-        const directData = await directResponse.json();
-        console.log('Direct fetch data:', directData);
-        
-        // If direct fetch works, use it
-        const { token, user } = directData;
-        localStorage.setItem('token', token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-        setCurrentUser(user);
-        return user;
-      } catch (directErr) {
-        console.error('Direct fetch error:', directErr);
-        // Fall back to axios if direct fetch fails
-      }
       
       const response = await axios.post('/api/auth/login', { username, password });
-      console.log('Axios response:', response);
-      
       const { token, user } = response.data;
       
       localStorage.setItem('token', token);
@@ -77,7 +48,6 @@ export function AuthProvider({ children }) {
       setCurrentUser(user);
       return user;
     } catch (err) {
-      console.error('Login error:', err);
       setError(translate(err.response?.data?.message || 'Failed to login'));
       throw err;
     }
