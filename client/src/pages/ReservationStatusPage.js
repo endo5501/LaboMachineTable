@@ -56,7 +56,7 @@ function ReservationStatusPage() {
       setReservations(reservationsResponse.data);
       setError('');
     } catch (err) {
-      setError('Failed to load reservation data. Please try again later.');
+      setError(translate('Failed to load reservation data. Please try again later.'));
     } finally {
       setLoading(false);
     }

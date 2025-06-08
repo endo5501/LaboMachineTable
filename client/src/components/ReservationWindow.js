@@ -38,7 +38,7 @@ function ReservationWindow({ equipment, onClose }) {
       const response = await axios.get(`/api/reservations/equipment/${equipment.id}`);
       setExistingReservations(response.data);
     } catch (err) {
-      setError('Failed to load existing reservations. Please try again.');
+      setError(translate('Failed to load existing reservations. Please try again.'));
     } finally {
       setLoading(false);
     }

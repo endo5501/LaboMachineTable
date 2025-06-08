@@ -80,6 +80,22 @@ const translations = {
   'Saving...': '保存中...',
   'Confirm Reservation': '予約を確定',
   
+  // Error Messages
+  'Failed to load equipment. Please try again later.': '装置の読み込みに失敗しました。後でもう一度お試しください。',
+  'Failed to save equipment. Please try again.': '装置の保存に失敗しました。もう一度お試しください。',
+  'Failed to delete equipment. Please try again.': '装置の削除に失敗しました。もう一度お試しください。',
+  'Are you sure you want to delete this equipment?': 'この装置を削除してもよろしいですか？',
+  'Update Equipment': '装置を更新',
+  'Failed to load reservation data. Please try again later.': '予約データの読み込みに失敗しました。後でもう一度お試しください。',
+  'Failed to load equipment layout. Please try again later.': '装置レイアウトの読み込みに失敗しました。後でもう一度お試しください。',
+  'Failed to update equipment position. Please try again.': '装置位置の更新に失敗しました。もう一度お試しください。',
+  'Failed to update text label position. Please try again.': 'テキストラベル位置の更新に失敗しました。もう一度お試しください。',
+  'Failed to save text label. Please try again.': 'テキストラベルの保存に失敗しました。もう一度お試しください。',
+  'Failed to delete text label. Please try again.': 'テキストラベルの削除に失敗しました。もう一度お試しください。',
+  'Failed to remove equipment from layout. Please try again.': 'レイアウトからの装置削除に失敗しました。もう一度お試しください。',
+  'Failed to save layout. Please try again.': 'レイアウトの保存に失敗しました。もう一度お試しください。',
+  'Failed to load existing reservations. Please try again.': '既存の予約の読み込みに失敗しました。もう一度お試しください。',
+  
   // Common
   'Save': '保存',
   'Edit': '編集',
