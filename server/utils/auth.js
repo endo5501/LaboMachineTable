@@ -1,8 +1,12 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// JWT secret key (should be in environment variables in production)
-const JWT_SECRET = process.env.JWT_SECRET || 'nc-reserve-secret-key';
+// JWT secret key (required environment variable)
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET environment variable is required');
+}
 const JWT_EXPIRES_IN = '24h';
 
 /**
