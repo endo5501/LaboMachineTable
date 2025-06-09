@@ -45,10 +45,21 @@ db.serialize(() => {
     )
   `);
 
+  // Layout Pages table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS layout_pages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Layout table
   db.run(`
     CREATE TABLE IF NOT EXISTS layout (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      page_id INTEGER NOT NULL DEFAULT 1,
       equipment_id INTEGER NOT NULL,
       x_position INTEGER NOT NULL,
       y_position INTEGER NOT NULL,
@@ -56,6 +67,7 @@ db.serialize(() => {
       height INTEGER NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (page_id) REFERENCES layout_pages (id) ON DELETE CASCADE,
       FOREIGN KEY (equipment_id) REFERENCES equipment (id) ON DELETE CASCADE
     )
   `);
@@ -80,13 +92,20 @@ db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS text_labels (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      page_id INTEGER NOT NULL DEFAULT 1,
       content TEXT NOT NULL,
       x_position INTEGER NOT NULL,
       y_position INTEGER NOT NULL,
       font_size INTEGER DEFAULT 16,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (page_id) REFERENCES layout_pages (id) ON DELETE CASCADE
     )
+  `);
+
+  // Insert default layout page if not exists
+  db.run(`
+    INSERT OR IGNORE INTO layout_pages (id, name) VALUES (1, 'メインページ')
   `);
 
   console.log('Database setup completed');

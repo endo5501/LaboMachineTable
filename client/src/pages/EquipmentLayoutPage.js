@@ -7,11 +7,15 @@ function EquipmentLayoutPage() {
   const [equipment, setEquipment] = useState([]);
   const [layout, setLayout] = useState([]);
   const [textLabels, setTextLabels] = useState([]);
+  const [layoutPages, setLayoutPages] = useState([]);
+  const [currentPageId, setCurrentPageId] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedEquipment, setSelectedEquipment] = useState(null);
   const [showReservationWindow, setShowReservationWindow] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [showNewPageDialog, setShowNewPageDialog] = useState(false);
+  const [newPageName, setNewPageName] = useState('');
   const [draggedEquipment, setDraggedEquipment] = useState(null);
   const [draggedLabel, setDraggedLabel] = useState(null);
   const [showTextInput, setShowTextInput] = useState(false);
@@ -28,6 +32,12 @@ function EquipmentLayoutPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (layoutPages.length > 0) {
+      fetchData();
+    }
+  }, [currentPageId]);
 
   // Store function references
   useEffect(() => {
@@ -51,13 +61,20 @@ function EquipmentLayoutPage() {
     try {
       setLoading(true);
       
-      // Fetch equipment, layout, reservation, user data, and text labels in parallel
-      const [equipmentResponse, layoutResponse, reservationsResponse, usersResponse, textLabelsResponse] = await Promise.all([
+      // Fetch equipment, layout pages, reservations, users in parallel
+      const [equipmentResponse, layoutPagesResponse, reservationsResponse, usersResponse] = await Promise.all([
         axios.get('/api/equipment'),
-        axios.get('/api/layout'),
+        axios.get('/api/layout/pages'),
         axios.get('/api/reservations'),
-        axios.get('/api/users'),
-        axios.get('/api/layout/labels')
+        axios.get('/api/users')
+      ]);
+      
+      setLayoutPages(layoutPagesResponse.data);
+      
+      // Fetch layout and text labels for current page
+      const [layoutResponse, textLabelsResponse] = await Promise.all([
+        axios.get(`/api/layout?pageId=${currentPageId}`),
+        axios.get(`/api/layout/labels?pageId=${currentPageId}`)
       ]);
       
       // Get current date and time
@@ -188,7 +205,7 @@ function EquipmentLayoutPage() {
           y_position: Math.max(0, y)
         };
         
-        await axios.put(`/api/layout/equipment/${equipmentId}`, updatedLayout);
+        await axios.put(`/api/layout/equipment/${equipmentId}`, { ...updatedLayout, page_id: currentPageId });
       } else {
         // Create new layout
         const newLayout = {
@@ -196,7 +213,8 @@ function EquipmentLayoutPage() {
           x_position: Math.max(0, x),
           y_position: Math.max(0, y),
           width: 150,
-          height: 100
+          height: 100,
+          page_id: currentPageId
         };
         
         await axios.post('/api/layout', [newLayout]);
@@ -222,7 +240,7 @@ function EquipmentLayoutPage() {
           height: Math.max(30, height) // Minimum height of 30px
         };
         
-        await axios.put(`/api/layout/equipment/${equipmentId}`, updatedLayout);
+        await axios.put(`/api/layout/equipment/${equipmentId}`, { ...updatedLayout, page_id: currentPageId });
         
         // Update local state immediately for better UX
         setLayout(prevLayout => 
@@ -320,7 +338,8 @@ function EquipmentLayoutPage() {
         await axios.post('/api/layout/labels', {
           content: textInputValue,
           x_position: textInputPosition.x,
-          y_position: textInputPosition.y
+          y_position: textInputPosition.y,
+          page_id: currentPageId
         });
       }
       
@@ -340,6 +359,56 @@ function EquipmentLayoutPage() {
     setEditingLabelId(null);
   };
 
+  const handlePageChange = (pageId) => {
+    setCurrentPageId(pageId);
+    setEditMode(false); // Exit edit mode when changing pages
+  };
+
+  const handleNewPage = async () => {
+    if (!newPageName.trim()) {
+      setError(translate('Page name is required'));
+      return;
+    }
+
+    try {
+      const response = await axios.post('/api/layout/pages', {
+        name: newPageName.trim()
+      });
+      
+      setLayoutPages(prev => [...prev, response.data]);
+      setCurrentPageId(response.data.id);
+      setNewPageName('');
+      setShowNewPageDialog(false);
+      setError('');
+    } catch (err) {
+      setError(translate('Failed to create new page. Please try again.'));
+    }
+  };
+
+  const handleDeletePage = async (pageId) => {
+    if (pageId === 1) {
+      setError(translate('Cannot delete the default page'));
+      return;
+    }
+
+    if (!window.confirm(translate('Are you sure you want to delete this page? All layouts and labels on this page will be permanently deleted.'))) {
+      return;
+    }
+
+    try {
+      await axios.delete(`/api/layout/pages/${pageId}`);
+      setLayoutPages(prev => prev.filter(page => page.id !== pageId));
+      
+      if (currentPageId === pageId) {
+        setCurrentPageId(1); // Switch to default page
+      }
+      
+      setError('');
+    } catch (err) {
+      setError(translate('Failed to delete page. Please try again.'));
+    }
+  };
+
   const deleteTextLabel = async (labelId) => {
     try {
       await axios.delete(`/api/layout/labels/${labelId}`);
@@ -351,7 +420,7 @@ function EquipmentLayoutPage() {
 
   const removeEquipmentFromLayout = async (equipmentId) => {
     try {
-      await axios.delete(`/api/layout/equipment/${equipmentId}`);
+      await axios.delete(`/api/layout/equipment/${equipmentId}?pageId=${currentPageId}`);
       fetchData();
     } catch (err) {
       setError(translate('Failed to remove equipment from layout. Please try again.'));
@@ -505,6 +574,85 @@ function EquipmentLayoutPage() {
               </>
             )}
           </div>
+        </div>
+        
+        {/* Page Tabs */}
+        <div className="page-tabs" style={{
+          borderBottom: '1px solid #dee2e6',
+          marginBottom: '20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          padding: '10px 0'
+        }}>
+          {layoutPages.map(page => (
+            <div key={page.id} style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
+              <button
+                onClick={() => handlePageChange(page.id)}
+                style={{
+                  padding: '8px 16px',
+                  border: currentPageId === page.id ? '2px solid #007bff' : '1px solid #dee2e6',
+                  backgroundColor: currentPageId === page.id ? '#007bff' : '#ffffff',
+                  color: currentPageId === page.id ? '#ffffff' : '#495057',
+                  borderRadius: '4px 4px 0 0',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  marginRight: page.id !== 1 ? '20px' : '5px',
+                  position: 'relative'
+                }}
+              >
+                {page.name}
+              </button>
+              {page.id !== 1 && (
+                <button
+                  onClick={() => handleDeletePage(page.id)}
+                  title={translate('Delete Page')}
+                  style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '0',
+                    padding: '2px 6px',
+                    border: '1px solid #dc3545',
+                    backgroundColor: '#dc3545',
+                    color: 'white',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    fontSize: '10px',
+                    lineHeight: '1',
+                    width: '18px',
+                    height: '18px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 10
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#c82333';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#dc3545';
+                  }}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+          <button
+            onClick={() => setShowNewPageDialog(true)}
+            style={{
+              padding: '8px 16px',
+              border: '1px solid #28a745',
+              backgroundColor: '#28a745',
+              color: 'white',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              marginLeft: '10px'
+            }}
+          >
+            + {translate('New Page')}
+          </button>
         </div>
         
         {error && (
@@ -745,6 +893,74 @@ function EquipmentLayoutPage() {
             equipment={selectedEquipment}
             onClose={handleCloseReservation}
           />
+        </>
+      )}
+      
+      {/* New Page Dialog */}
+      {showNewPageDialog && (
+        <>
+          <div className="overlay" onClick={() => setShowNewPageDialog(false)}></div>
+          <div className="dialog" style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
+            zIndex: 1000,
+            minWidth: '300px'
+          }}>
+            <h3 style={{ marginTop: 0 }}>{translate('Create New Page')}</h3>
+            <div style={{ marginBottom: '15px' }}>
+              <label htmlFor="newPageName" style={{ display: 'block', marginBottom: '5px' }}>
+                {translate('Page Name:')}
+              </label>
+              <input
+                id="newPageName"
+                type="text"
+                value={newPageName}
+                onChange={(e) => setNewPageName(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleNewPage()}
+                autoFocus
+                style={{ 
+                  width: '100%', 
+                  padding: '8px', 
+                  border: '1px solid #dee2e6',
+                  borderRadius: '4px'
+                }}
+              />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+              <button
+                onClick={() => setShowNewPageDialog(false)}
+                style={{ 
+                  padding: '8px 16px',
+                  border: '1px solid #6c757d',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                {translate('Cancel')}
+              </button>
+              <button
+                onClick={handleNewPage}
+                style={{ 
+                  padding: '8px 16px',
+                  border: '1px solid #28a745',
+                  backgroundColor: '#28a745',
+                  color: 'white',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                {translate('Create')}
+              </button>
+            </div>
+          </div>
         </>
       )}
     </div>

@@ -59,6 +59,16 @@ const translations = {
   'Double-click to add text': 'ダブルクリックでテキストを追加',
   'Equipment Palette': '装置パレット',
   'Drag items to the layout': 'アイテムをレイアウトにドラッグ',
+  'New Page': '新規ページ',
+  'Create New Page': '新規ページを作成',
+  'Delete Page': 'ページを削除',
+  'Page Name:': 'ページ名:',
+  'Create': '作成',
+  'Page name is required': 'ページ名は必須です',
+  'Failed to create new page. Please try again.': '新規ページの作成に失敗しました。もう一度お試しください。',
+  'Cannot delete the default page': 'デフォルトページは削除できません',
+  'Are you sure you want to delete this page? All layouts and labels on this page will be permanently deleted.': 'このページを削除してもよろしいですか？このページの全ての配置図とラベルが完全に削除されます。',
+  'Failed to delete page. Please try again.': 'ページの削除に失敗しました。もう一度お試しください。',
   
   // Reservation Status Page
   'Reservation Status': '予約状況',

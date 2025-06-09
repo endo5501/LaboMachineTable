@@ -8,13 +8,134 @@ const router = express.Router();
 router.use(authenticate);
 
 /**
+ * @route   GET /api/layout/pages
+ * @desc    Get all layout pages
+ * @access  Private
+ */
+router.get('/pages', async (req, res) => {
+  try {
+    const pages = await all('SELECT * FROM layout_pages ORDER BY id');
+    res.json(pages);
+  } catch (err) {
+    console.error('Get layout pages error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   POST /api/layout/pages
+ * @desc    Create a new layout page
+ * @access  Private
+ */
+router.post('/pages', async (req, res) => {
+  try {
+    const { name } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ message: 'Page name is required' });
+    }
+    
+    const result = await run(
+      'INSERT INTO layout_pages (name) VALUES (?)',
+      [name]
+    );
+    
+    const newPage = await get(
+      'SELECT * FROM layout_pages WHERE id = ?',
+      [result.id]
+    );
+    
+    res.status(201).json(newPage);
+  } catch (err) {
+    console.error('Create layout page error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   PUT /api/layout/pages/:id
+ * @desc    Update a layout page name
+ * @access  Private
+ */
+router.put('/pages/:id', async (req, res) => {
+  try {
+    const { name } = req.body;
+    const pageId = req.params.id;
+    
+    if (!name) {
+      return res.status(400).json({ message: 'Page name is required' });
+    }
+    
+    // Check if page exists
+    const page = await get('SELECT id FROM layout_pages WHERE id = ?', [pageId]);
+    if (!page) {
+      return res.status(404).json({ message: 'Layout page not found' });
+    }
+    
+    await run(
+      'UPDATE layout_pages SET name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [name, pageId]
+    );
+    
+    const updatedPage = await get(
+      'SELECT * FROM layout_pages WHERE id = ?',
+      [pageId]
+    );
+    
+    res.json(updatedPage);
+  } catch (err) {
+    console.error('Update layout page error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
+ * @route   DELETE /api/layout/pages/:id
+ * @desc    Delete a layout page
+ * @access  Private
+ */
+router.delete('/pages/:id', async (req, res) => {
+  try {
+    const pageId = req.params.id;
+    
+    // Prevent deleting the default page
+    if (pageId === '1') {
+      return res.status(400).json({ message: 'Cannot delete the default page' });
+    }
+    
+    // Check if page exists
+    const page = await get('SELECT id FROM layout_pages WHERE id = ?', [pageId]);
+    if (!page) {
+      return res.status(404).json({ message: 'Layout page not found' });
+    }
+    
+    await run('DELETE FROM layout_pages WHERE id = ?', [pageId]);
+    
+    res.json({ message: 'Layout page deleted' });
+  } catch (err) {
+    console.error('Delete layout page error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+/**
  * @route   GET /api/layout
- * @desc    Get all equipment layout
+ * @desc    Get all equipment layout (optionally filtered by page)
  * @access  Private
  */
 router.get('/', async (req, res) => {
   try {
-    const layout = await all('SELECT * FROM layout');
+    const { pageId } = req.query;
+    
+    let query = 'SELECT * FROM layout';
+    let params = [];
+    
+    if (pageId) {
+      query += ' WHERE page_id = ?';
+      params = [pageId];
+    }
+    
+    const layout = await all(query, params);
     res.json(layout);
   } catch (err) {
     console.error('Get layout error:', err);
@@ -24,15 +145,22 @@ router.get('/', async (req, res) => {
 
 /**
  * @route   GET /api/layout/equipment/:id
- * @desc    Get layout for specific equipment
+ * @desc    Get layout for specific equipment (optionally filtered by page)
  * @access  Private
  */
 router.get('/equipment/:id', async (req, res) => {
   try {
-    const layout = await get(
-      'SELECT * FROM layout WHERE equipment_id = ?',
-      [req.params.id]
-    );
+    const { pageId } = req.query;
+    
+    let query = 'SELECT * FROM layout WHERE equipment_id = ?';
+    let params = [req.params.id];
+    
+    if (pageId) {
+      query += ' AND page_id = ?';
+      params.push(pageId);
+    }
+    
+    const layout = await get(query, params);
     
     if (!layout) {
       return res.status(404).json({ message: 'Layout not found for this equipment' });
@@ -59,7 +187,7 @@ router.post('/', async (req, res) => {
     const results = [];
     
     for (const item of req.body) {
-      const { equipment_id, x_position, y_position, width, height } = item;
+      const { equipment_id, x_position, y_position, width, height, page_id = 1 } = item;
       
       if (!equipment_id || x_position === undefined || y_position === undefined) {
         return res.status(400).json({ 
@@ -74,10 +202,16 @@ router.post('/', async (req, res) => {
         return res.status(404).json({ message: `Equipment with ID ${equipment_id} not found` });
       }
       
-      // Check if layout already exists for this equipment
+      // Check if page exists
+      const page = await get('SELECT id FROM layout_pages WHERE id = ?', [page_id]);
+      if (!page) {
+        return res.status(404).json({ message: `Layout page with ID ${page_id} not found` });
+      }
+      
+      // Check if layout already exists for this equipment on this page
       const existingLayout = await get(
-        'SELECT id FROM layout WHERE equipment_id = ?',
-        [equipment_id]
+        'SELECT id FROM layout WHERE equipment_id = ? AND page_id = ?',
+        [equipment_id, page_id]
       );
       
       let result;
@@ -91,18 +225,20 @@ router.post('/', async (req, res) => {
             width = ?, 
             height = ?,
             updated_at = CURRENT_TIMESTAMP
-          WHERE equipment_id = ?`,
+          WHERE equipment_id = ? AND page_id = ?`,
           [
             x_position, 
             y_position, 
             width || 150, 
             height || 100, 
-            equipment_id
+            equipment_id,
+            page_id
           ]
         );
         
         results.push({
           id: existingLayout.id,
+          page_id,
           equipment_id,
           x_position,
           y_position,
@@ -114,9 +250,10 @@ router.post('/', async (req, res) => {
         // Create new layout
         result = await run(
           `INSERT INTO layout 
-            (equipment_id, x_position, y_position, width, height) 
-          VALUES (?, ?, ?, ?, ?)`,
+            (page_id, equipment_id, x_position, y_position, width, height) 
+          VALUES (?, ?, ?, ?, ?, ?)`,
           [
+            page_id,
             equipment_id, 
             x_position, 
             y_position, 
@@ -127,6 +264,7 @@ router.post('/', async (req, res) => {
         
         results.push({
           id: result.id,
+          page_id,
           equipment_id,
           x_position,
           y_position,
@@ -151,7 +289,7 @@ router.post('/', async (req, res) => {
  */
 router.put('/equipment/:id', async (req, res) => {
   try {
-    const { x_position, y_position, width, height } = req.body;
+    const { x_position, y_position, width, height, page_id = 1 } = req.body;
     const equipment_id = req.params.id;
     
     if (x_position === undefined || y_position === undefined) {
@@ -167,10 +305,16 @@ router.put('/equipment/:id', async (req, res) => {
       return res.status(404).json({ message: 'Equipment not found' });
     }
     
-    // Check if layout already exists for this equipment
+    // Check if page exists
+    const page = await get('SELECT id FROM layout_pages WHERE id = ?', [page_id]);
+    if (!page) {
+      return res.status(404).json({ message: `Layout page with ID ${page_id} not found` });
+    }
+    
+    // Check if layout already exists for this equipment on this page
     const existingLayout = await get(
-      'SELECT id FROM layout WHERE equipment_id = ?',
-      [equipment_id]
+      'SELECT id FROM layout WHERE equipment_id = ? AND page_id = ?',
+      [equipment_id, page_id]
     );
     
     let result;
@@ -184,19 +328,20 @@ router.put('/equipment/:id', async (req, res) => {
           width = ?, 
           height = ?,
           updated_at = CURRENT_TIMESTAMP
-        WHERE equipment_id = ?`,
+        WHERE equipment_id = ? AND page_id = ?`,
         [
           x_position, 
           y_position, 
           width || 150, 
           height || 100, 
-          equipment_id
+          equipment_id,
+          page_id
         ]
       );
       
       const updatedLayout = await get(
-        'SELECT * FROM layout WHERE equipment_id = ?',
-        [equipment_id]
+        'SELECT * FROM layout WHERE equipment_id = ? AND page_id = ?',
+        [equipment_id, page_id]
       );
       
       res.json(updatedLayout);
@@ -204,9 +349,10 @@ router.put('/equipment/:id', async (req, res) => {
       // Create new layout
       result = await run(
         `INSERT INTO layout 
-          (equipment_id, x_position, y_position, width, height) 
-        VALUES (?, ?, ?, ?, ?)`,
+          (page_id, equipment_id, x_position, y_position, width, height) 
+        VALUES (?, ?, ?, ?, ?, ?)`,
         [
+          page_id,
           equipment_id, 
           x_position, 
           y_position, 
@@ -236,19 +382,33 @@ router.put('/equipment/:id', async (req, res) => {
 router.delete('/equipment/:id', async (req, res) => {
   try {
     const equipment_id = req.params.id;
+    const { pageId } = req.query;
     
-    // Check if layout exists for this equipment
-    const layout = await get(
-      'SELECT id FROM layout WHERE equipment_id = ?',
-      [equipment_id]
-    );
-    
-    if (!layout) {
-      return res.status(404).json({ message: 'Layout not found for this equipment' });
+    if (pageId) {
+      // Delete layout for specific equipment on specific page
+      const layout = await get(
+        'SELECT id FROM layout WHERE equipment_id = ? AND page_id = ?',
+        [equipment_id, pageId]
+      );
+      
+      if (!layout) {
+        return res.status(404).json({ message: 'Layout not found for this equipment on this page' });
+      }
+      
+      await run('DELETE FROM layout WHERE equipment_id = ? AND page_id = ?', [equipment_id, pageId]);
+    } else {
+      // Delete all layouts for this equipment across all pages
+      const layout = await get(
+        'SELECT id FROM layout WHERE equipment_id = ?',
+        [equipment_id]
+      );
+      
+      if (!layout) {
+        return res.status(404).json({ message: 'Layout not found for this equipment' });
+      }
+      
+      await run('DELETE FROM layout WHERE equipment_id = ?', [equipment_id]);
     }
-    
-    // Delete layout
-    await run('DELETE FROM layout WHERE equipment_id = ?', [equipment_id]);
     
     res.json({ message: 'Layout deleted' });
   } catch (err) {
@@ -259,12 +419,22 @@ router.delete('/equipment/:id', async (req, res) => {
 
 /**
  * @route   GET /api/layout/labels
- * @desc    Get all text labels
+ * @desc    Get all text labels (optionally filtered by page)
  * @access  Private
  */
 router.get('/labels', async (req, res) => {
   try {
-    const labels = await all('SELECT * FROM text_labels');
+    const { pageId } = req.query;
+    
+    let query = 'SELECT * FROM text_labels';
+    let params = [];
+    
+    if (pageId) {
+      query += ' WHERE page_id = ?';
+      params = [pageId];
+    }
+    
+    const labels = await all(query, params);
     res.json(labels);
   } catch (err) {
     console.error('Get text labels error:', err);
@@ -302,7 +472,7 @@ router.get('/labels/:id', async (req, res) => {
  */
 router.post('/labels', async (req, res) => {
   try {
-    const { content, x_position, y_position, font_size } = req.body;
+    const { content, x_position, y_position, font_size, page_id = 1 } = req.body;
     
     if (!content || x_position === undefined || y_position === undefined) {
       return res.status(400).json({ 
@@ -310,11 +480,18 @@ router.post('/labels', async (req, res) => {
       });
     }
     
+    // Check if page exists
+    const page = await get('SELECT id FROM layout_pages WHERE id = ?', [page_id]);
+    if (!page) {
+      return res.status(404).json({ message: `Layout page with ID ${page_id} not found` });
+    }
+    
     const result = await run(
       `INSERT INTO text_labels 
-        (content, x_position, y_position, font_size) 
-      VALUES (?, ?, ?, ?)`,
+        (page_id, content, x_position, y_position, font_size) 
+      VALUES (?, ?, ?, ?, ?)`,
       [
+        page_id,
         content, 
         x_position, 
         y_position, 
