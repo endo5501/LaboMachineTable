@@ -23,7 +23,14 @@ LaboMachineTableは、実験室装置の予約プロセスを管理し効率化�
 - Node.js（v14.x以上）
 - npm（v6.x以上）
 
+またはDockerを使用する場合：
+
+- Docker
+- Docker Compose
+
 ## インストール
+
+### 通常のインストール
 
 1. リポジトリをクローンする：
    ```bash
@@ -50,6 +57,65 @@ LaboMachineTableは、実験室装置の予約プロセスを管理し効率化�
    cd ../server
    npm run db:setup
    ```
+
+### Dockerを使用したインストール
+
+1. リポジトリをクローンする：
+   ```bash
+   git clone <repository-url>
+   cd LaboMachineTable
+   ```
+
+2. データベース用のディレクトリを作成する：
+   ```bash
+   mkdir -p ./data
+   ```
+
+3. Docker Composeで起動する：
+   ```bash
+   docker-compose up -d
+   ```
+
+アプリケーションは http://localhost:5001 でアクセスできます。
+
+#### Dockerでのデータベース永続化
+
+データベースファイルは `./data` ディレクトリにマウントされており、コンテナを削除してもデータは保持されます。この設計により、アプリケーションのバージョンアップ時にもデータを失うことなく更新できます。
+
+#### バージョンアップ方法
+
+新しいバージョンのイメージに更新する場合：
+
+```bash
+# 新しいイメージをビルド
+docker-compose build --no-cache
+
+# コンテナを再起動
+docker-compose up -d
+```
+
+Docker Hubなどのレジストリからイメージを取得する場合：
+
+```bash
+# 新しいイメージをプル
+docker pull <your-registry>/labomachine:latest
+
+# コンテナを再起動
+docker-compose up -d
+```
+
+#### Docker環境の設定
+
+環境変数は `.env` ファイルで設定できます。`.env.example` をコピーして使用してください：
+
+```bash
+cp .env.example .env
+```
+
+主要な環境変数：
+- `JWT_SECRET`: JWT認証用の秘密鍵（本番環境では必ず変更してください）
+- `DATABASE_DIR`: データベースファイルの保存先ディレクトリ（デフォルト: `./data`）
+- `PORT`: アプリケーションのポート番号（デフォルト: 5001）
 
 ## 開発
 

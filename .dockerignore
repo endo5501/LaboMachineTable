@@ -1,0 +1,67 @@
+# Dependencies
+node_modules
+npm-debug.log*
+
+# Production build
+client/build
+
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+coverage
+__tests__
+*.test.js
+
+# Development files
+.git
+.gitignore
+README*.md
+TESTING.md
+LICENSE
+
+# Docker files
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Memory bank (project documentation)
+memory-bank
+
+# Database files (will be mounted externally)
+database
+*.sqlite
+*.db
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm

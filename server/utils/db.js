@@ -1,8 +1,8 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-// Database file path
-const dbPath = path.join(__dirname, '../../database/database.sqlite');
+// Database file path - support Docker environment variable
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../database/database.sqlite');
 
 // Create a database connection
 const db = new sqlite3.Database(dbPath, (err) => {

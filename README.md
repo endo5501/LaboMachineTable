@@ -23,7 +23,14 @@ LaboMachineTable is a web application designed to manage and streamline the rese
 - Node.js (v14.x or higher)
 - npm (v6.x or higher)
 
+Or for Docker deployment:
+
+- Docker
+- Docker Compose
+
 ## Installation
+
+### Standard Installation
 
 1. Clone the repository:
    ```bash
@@ -50,6 +57,52 @@ LaboMachineTable is a web application designed to manage and streamline the rese
    cd ../server
    npm run db:setup
    ```
+
+### Docker Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd LaboMachineTable
+   ```
+
+2. Create database directory:
+   ```bash
+   mkdir -p ./data
+   ```
+
+3. Start with Docker Compose:
+   ```bash
+   docker-compose up -d
+   ```
+
+The application will be available at http://localhost:5001
+
+#### Database Persistence
+
+The database file is mounted to the `./data` directory, ensuring data persistence even when containers are removed.
+
+#### Updating
+
+To update to a new version:
+
+```bash
+# Build new image
+docker-compose build --no-cache
+
+# Restart container
+docker-compose up -d
+```
+
+Or when pulling from a registry:
+
+```bash
+# Pull new image
+docker pull <your-registry>/labomachine:latest
+
+# Restart container
+docker-compose up -d
+```
 
 ## Development
 
