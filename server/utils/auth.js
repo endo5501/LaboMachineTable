@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 // JWT secret key (required environment variable)
-const JWT_SECRET = process.env.JWT_SECRET;
+const { JWT_SECRET } = process.env;
 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is required');
@@ -25,18 +25,14 @@ const hashPassword = async (password) => {
  * @param {string} hash - Hashed password
  * @returns {Promise<boolean>} - True if password matches hash
  */
-const comparePassword = async (password, hash) => {
-  return await bcrypt.compare(password, hash);
-};
+const comparePassword = async (password, hash) => await bcrypt.compare(password, hash);
 
 /**
  * Generate a JWT token
  * @param {Object} payload - Token payload
  * @returns {string} - JWT token
  */
-const generateToken = (payload) => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-};
+const generateToken = (payload) => jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 
 /**
  * Verify a JWT token
@@ -58,11 +54,11 @@ const verifyToken = (token) => {
  */
 const getTokenFromRequest = (req) => {
   const authHeader = req.headers.authorization;
-  
+
   if (authHeader && authHeader.startsWith('Bearer ')) {
     return authHeader.substring(7);
   }
-  
+
   return null;
 };
 
@@ -71,5 +67,5 @@ module.exports = {
   comparePassword,
   generateToken,
   verifyToken,
-  getTokenFromRequest
+  getTokenFromRequest,
 };

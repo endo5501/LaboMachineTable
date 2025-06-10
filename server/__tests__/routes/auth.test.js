@@ -12,7 +12,7 @@ jest.mock('../../middleware/auth', () => ({
     // Mock authenticate middleware
     req.user = { id: 1, username: 'testuser', name: 'Test User' };
     next();
-  }
+  },
 }));
 
 const app = express();
@@ -32,7 +32,7 @@ describe('Auth Routes', () => {
         username: 'testuser',
         password: 'hashedpassword',
         name: 'Test User',
-        email: 'test@example.com'
+        email: 'test@example.com',
       };
       const mockToken = 'mock-jwt-token';
 
@@ -44,7 +44,7 @@ describe('Auth Routes', () => {
         .post('/api/auth/login')
         .send({
           username: 'testuser',
-          password: 'testpass'
+          password: 'testpass',
         });
 
       expect(response.status).toBe(200);
@@ -54,8 +54,8 @@ describe('Auth Routes', () => {
           id: 1,
           username: 'testuser',
           name: 'Test User',
-          email: 'test@example.com'
-        }
+          email: 'test@example.com',
+        },
       });
 
       expect(get).toHaveBeenCalledWith('SELECT * FROM users WHERE username = ?', ['testuser']);
@@ -67,7 +67,7 @@ describe('Auth Routes', () => {
       const mockUser = {
         id: 1,
         username: 'testuser',
-        password: 'hashedpassword'
+        password: 'hashedpassword',
       };
 
       get.mockResolvedValue(mockUser);
@@ -77,7 +77,7 @@ describe('Auth Routes', () => {
         .post('/api/auth/login')
         .send({
           username: 'testuser',
-          password: 'wrongpass'
+          password: 'wrongpass',
         });
 
       expect(response.status).toBe(401);
@@ -91,7 +91,7 @@ describe('Auth Routes', () => {
         username: 'newuser',
         password: 'hashedpassword',
         name: null,
-        email: null
+        email: null,
       };
 
       get.mockResolvedValueOnce(null); // User doesn't exist
@@ -104,7 +104,7 @@ describe('Auth Routes', () => {
         .post('/api/auth/login')
         .send({
           username: 'newuser',
-          password: 'newpass'
+          password: 'newpass',
         });
 
       expect(response.status).toBe(200);
@@ -114,27 +114,27 @@ describe('Auth Routes', () => {
           id: 2,
           username: 'newuser',
           name: null,
-          email: null
-        }
+          email: null,
+        },
       });
 
       expect(hashPassword).toHaveBeenCalledWith('newpass');
       expect(run).toHaveBeenCalledWith(
         'INSERT INTO users (username, password) VALUES (?, ?)',
-        ['newuser', 'hashedpassword']
+        ['newuser', 'hashedpassword'],
       );
     });
 
     test('should reject new user when auto-registration is disabled', async () => {
       process.env.ENABLE_AUTO_REGISTRATION = 'false';
-      
+
       get.mockResolvedValue(null); // User doesn't exist
 
       const response = await request(app)
         .post('/api/auth/login')
         .send({
           username: 'newuser',
-          password: 'newpass'
+          password: 'newpass',
         });
 
       expect(response.status).toBe(401);
@@ -147,7 +147,7 @@ describe('Auth Routes', () => {
       const response = await request(app)
         .post('/api/auth/login')
         .send({
-          username: 'testuser'
+          username: 'testuser',
           // missing password
         });
 
@@ -162,7 +162,7 @@ describe('Auth Routes', () => {
         .post('/api/auth/login')
         .send({
           username: 'testuser',
-          password: 'testpass'
+          password: 'testpass',
         });
 
       expect(response.status).toBe(500);
@@ -179,7 +179,7 @@ describe('Auth Routes', () => {
       expect(response.body).toEqual({
         id: 1,
         username: 'testuser',
-        name: 'Test User'
+        name: 'Test User',
       });
     });
   });

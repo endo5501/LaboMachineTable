@@ -7,7 +7,7 @@ import translations from './translations';
  */
 const translate = (text) => {
   if (!text) return '';
-  
+
   // Return the translation if it exists, otherwise return the original text
   return translations[text] || text;
 };

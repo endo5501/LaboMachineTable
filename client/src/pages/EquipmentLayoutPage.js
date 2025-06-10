@@ -24,7 +24,6 @@ function EquipmentLayoutPage() {
   const [editingLabelId, setEditingLabelId] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [resizingEquipment, setResizingEquipment] = useState(null);
-  const [resizeStartData, setResizeStartData] = useState(null);
   const layoutContainerRef = useRef(null);
   const resizeFunctionsRef = useRef({});
   const resizeDataRef = useRef({ equipmentId: null, startData: null, currentSize: null });
@@ -60,57 +59,57 @@ function EquipmentLayoutPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch equipment, layout pages, reservations, users in parallel
       const [equipmentResponse, layoutPagesResponse, reservationsResponse, usersResponse] = await Promise.all([
         axios.get('/api/equipment'),
         axios.get('/api/layout/pages'),
         axios.get('/api/reservations'),
-        axios.get('/api/users')
+        axios.get('/api/users'),
       ]);
-      
+
       setLayoutPages(layoutPagesResponse.data);
-      
+
       // Fetch layout and text labels for current page
       const [layoutResponse, textLabelsResponse] = await Promise.all([
         axios.get(`/api/layout?pageId=${currentPageId}`),
-        axios.get(`/api/layout/labels?pageId=${currentPageId}`)
+        axios.get(`/api/layout/labels?pageId=${currentPageId}`),
       ]);
-      
+
       // Get current date and time
       const now = new Date();
-      
+
       // Process equipment data to include current user information
       const equipmentData = equipmentResponse.data;
       const reservations = reservationsResponse.data;
       const users = usersResponse.data;
-      
+
       // Create a map of user IDs to usernames for quick lookup
       const userMap = {};
-      users.forEach(user => {
+      users.forEach((user) => {
         userMap[user.id] = user.username;
       });
-      
+
       // Find current reservations for each equipment
-      const equipmentWithUsers = equipmentData.map(equipment => {
-        const currentReservation = reservations.find(reservation => {
+      const equipmentWithUsers = equipmentData.map((equipment) => {
+        const currentReservation = reservations.find((reservation) => {
           const startTime = new Date(reservation.start_time);
           const endTime = new Date(reservation.end_time);
-          return reservation.equipment_id === equipment.id && 
-                 now >= startTime && 
-                 now <= endTime;
+          return reservation.equipment_id === equipment.id
+                 && now >= startTime
+                 && now <= endTime;
         });
-        
+
         // Get the username if there's a current reservation
         const userId = currentReservation ? currentReservation.user_id : null;
         const username = userId ? userMap[userId] : null;
-        
+
         return {
           ...equipment,
-          current_user: username
+          current_user: username,
         };
       });
-      
+
       setEquipment(equipmentWithUsers);
       setLayout(layoutResponse.data);
       setTextLabels(textLabelsResponse.data);
@@ -124,7 +123,7 @@ function EquipmentLayoutPage() {
 
   const handleEquipmentClick = (equipmentItem) => {
     if (editMode) return; // Don't open reservation window in edit mode
-    
+
     setSelectedEquipment(equipmentItem);
     setShowReservationWindow(true);
   };
@@ -140,11 +139,11 @@ function EquipmentLayoutPage() {
 
   const handleDragStart = (e, equipmentId) => {
     if (!editMode) return;
-    
+
     setDraggedEquipment(equipmentId);
-    
+
     // Find the equipment's current position
-    const equipmentLayout = layout.find(item => item.equipment_id === equipmentId);
+    const equipmentLayout = layout.find((item) => item.equipment_id === equipmentId);
     if (equipmentLayout) {
       // Calculate offset between mouse position and equipment top-left corner
       const rect = e.currentTarget.getBoundingClientRect();
@@ -152,7 +151,7 @@ function EquipmentLayoutPage() {
       const offsetY = e.clientY - rect.top;
       setDragOffset({ x: offsetX, y: offsetY });
     }
-    
+
     // Set transparent drag image
     const img = new Image();
     img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -161,23 +160,23 @@ function EquipmentLayoutPage() {
 
   const handleDragOver = (e) => {
     if (!editMode || (!draggedEquipment && !draggedLabel)) return;
-    
+
     e.preventDefault();
   };
 
   const handleDrop = (e) => {
     if (!editMode) return;
-    
+
     e.preventDefault();
-    
+
     // Get drop position relative to layout container
     const container = layoutContainerRef.current;
     const rect = container.getBoundingClientRect();
-    
+
     // Apply the offset to get the correct position
     const x = e.clientX - rect.left - dragOffset.x;
     const y = e.clientY - rect.top - dragOffset.y;
-    
+
     if (draggedEquipment) {
       // Update layout for the dragged equipment
       updateEquipmentPosition(draggedEquipment, x, y);
@@ -187,7 +186,7 @@ function EquipmentLayoutPage() {
       updateTextLabelPosition(draggedLabel, x, y);
       setDraggedLabel(null);
     }
-    
+
     // Reset drag offset
     setDragOffset({ x: 0, y: 0 });
   };
@@ -195,16 +194,16 @@ function EquipmentLayoutPage() {
   const updateEquipmentPosition = async (equipmentId, x, y) => {
     try {
       // Find existing layout for this equipment
-      const existingLayout = layout.find(item => item.equipment_id === equipmentId);
-      
+      const existingLayout = layout.find((item) => item.equipment_id === equipmentId);
+
       if (existingLayout) {
         // Update existing layout
         const updatedLayout = {
           ...existingLayout,
           x_position: Math.max(0, x),
-          y_position: Math.max(0, y)
+          y_position: Math.max(0, y),
         };
-        
+
         await axios.put(`/api/layout/equipment/${equipmentId}`, { ...updatedLayout, page_id: currentPageId });
       } else {
         // Create new layout
@@ -214,12 +213,12 @@ function EquipmentLayoutPage() {
           y_position: Math.max(0, y),
           width: 150,
           height: 100,
-          page_id: currentPageId
+          page_id: currentPageId,
         };
-        
+
         await axios.post('/api/layout', [newLayout]);
       }
-      
+
       // Refresh layout data
       fetchData();
     } catch (err) {
@@ -230,24 +229,20 @@ function EquipmentLayoutPage() {
   const updateEquipmentSize = async (equipmentId, width, height) => {
     try {
       // Find existing layout for this equipment
-      const existingLayout = layout.find(item => item.equipment_id === equipmentId);
-      
+      const existingLayout = layout.find((item) => item.equipment_id === equipmentId);
+
       if (existingLayout) {
         // Update existing layout size
         const updatedLayout = {
           ...existingLayout,
           width: Math.max(50, width), // Minimum width of 50px
-          height: Math.max(30, height) // Minimum height of 30px
+          height: Math.max(30, height), // Minimum height of 30px
         };
-        
+
         await axios.put(`/api/layout/equipment/${equipmentId}`, { ...updatedLayout, page_id: currentPageId });
-        
+
         // Update local state immediately for better UX
-        setLayout(prevLayout => 
-          prevLayout.map(item => 
-            item.equipment_id === equipmentId ? updatedLayout : item
-          )
-        );
+        setLayout((prevLayout) => prevLayout.map((item) => (item.equipment_id === equipmentId ? updatedLayout : item)));
       }
     } catch (err) {
       setError(translate('Failed to update equipment size. Please try again.'));
@@ -258,9 +253,9 @@ function EquipmentLayoutPage() {
     try {
       await axios.put(`/api/layout/labels/${labelId}`, {
         x_position: Math.max(0, x),
-        y_position: Math.max(0, y)
+        y_position: Math.max(0, y),
       });
-      
+
       // Refresh data
       fetchData();
     } catch (err) {
@@ -270,11 +265,11 @@ function EquipmentLayoutPage() {
 
   const handleTextLabelDragStart = (e, labelId) => {
     if (!editMode) return;
-    
+
     setDraggedLabel(labelId);
-    
+
     // Find the label's current position
-    const label = textLabels.find(item => item.id === labelId);
+    const label = textLabels.find((item) => item.id === labelId);
     if (label) {
       // Calculate offset between mouse position and label top-left corner
       const rect = e.currentTarget.getBoundingClientRect();
@@ -282,7 +277,7 @@ function EquipmentLayoutPage() {
       const offsetY = e.clientY - rect.top;
       setDragOffset({ x: offsetX, y: offsetY });
     }
-    
+
     // Set transparent drag image
     const img = new Image();
     img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
@@ -291,15 +286,15 @@ function EquipmentLayoutPage() {
 
   const handleLayoutDoubleClick = (e) => {
     if (!editMode) return;
-    
+
     // Prevent double click from being triggered on equipment or text labels
     if (e.target !== layoutContainerRef.current) return;
-    
+
     // Get click position relative to layout container
     const rect = layoutContainerRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     // Show text input at this position
     setTextInputPosition({ x, y });
     setTextInputValue('');
@@ -309,9 +304,9 @@ function EquipmentLayoutPage() {
 
   const handleTextLabelClick = (e, label) => {
     if (!editMode) return;
-    
+
     e.stopPropagation();
-    
+
     // Show text input at this position
     setTextInputPosition({ x: label.x_position, y: label.y_position });
     setTextInputValue(label.content);
@@ -321,17 +316,17 @@ function EquipmentLayoutPage() {
 
   const handleTextInputSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!textInputValue.trim()) {
       setShowTextInput(false);
       return;
     }
-    
+
     try {
       if (editingLabelId) {
         // Update existing label
         await axios.put(`/api/layout/labels/${editingLabelId}`, {
-          content: textInputValue
+          content: textInputValue,
         });
       } else {
         // Create new label
@@ -339,10 +334,10 @@ function EquipmentLayoutPage() {
           content: textInputValue,
           x_position: textInputPosition.x,
           y_position: textInputPosition.y,
-          page_id: currentPageId
+          page_id: currentPageId,
         });
       }
-      
+
       // Reset state and refresh data
       setShowTextInput(false);
       setTextInputValue('');
@@ -372,10 +367,10 @@ function EquipmentLayoutPage() {
 
     try {
       const response = await axios.post('/api/layout/pages', {
-        name: newPageName.trim()
+        name: newPageName.trim(),
       });
-      
-      setLayoutPages(prev => [...prev, response.data]);
+
+      setLayoutPages((prev) => [...prev, response.data]);
       setCurrentPageId(response.data.id);
       setNewPageName('');
       setShowNewPageDialog(false);
@@ -397,12 +392,12 @@ function EquipmentLayoutPage() {
 
     try {
       await axios.delete(`/api/layout/pages/${pageId}`);
-      setLayoutPages(prev => prev.filter(page => page.id !== pageId));
-      
+      setLayoutPages((prev) => prev.filter((page) => page.id !== pageId));
+
       if (currentPageId === pageId) {
         setCurrentPageId(1); // Switch to default page
       }
-      
+
       setError('');
     } catch (err) {
       setError(translate('Failed to delete page. Please try again.'));
@@ -440,43 +435,38 @@ function EquipmentLayoutPage() {
   const handleResizeMove = (e) => {
     const currentEquipmentId = resizeDataRef.current.equipmentId;
     const currentStartData = resizeDataRef.current.startData;
-    
+
     if (!currentEquipmentId || !currentStartData) {
       return;
     }
-    
+
     const deltaX = e.clientX - currentStartData.startX;
     const deltaY = e.clientY - currentStartData.startY;
-    
+
     const newWidth = Math.max(50, currentStartData.startWidth + deltaX);
     const newHeight = Math.max(30, currentStartData.startHeight + deltaY);
-    
+
     // Store current size in ref
     resizeDataRef.current.currentSize = { width: newWidth, height: newHeight };
-    
+
     // Update local state immediately for visual feedback
-    setLayout(prevLayout => 
-      prevLayout.map(item => 
-        item.equipment_id === currentEquipmentId 
-          ? { ...item, width: newWidth, height: newHeight }
-          : item
-      )
-    );
+    setLayout((prevLayout) => prevLayout.map((item) => (item.equipment_id === currentEquipmentId
+      ? { ...item, width: newWidth, height: newHeight }
+      : item)));
   };
 
   const handleResizeEnd = () => {
     const currentEquipmentId = resizeDataRef.current.equipmentId;
-    const currentSize = resizeDataRef.current.currentSize;
-    
+    const { currentSize } = resizeDataRef.current;
+
     if (currentEquipmentId && currentSize) {
       updateEquipmentSize(currentEquipmentId, currentSize.width, currentSize.height);
     }
-    
+
     // Clear refs and state
     resizeDataRef.current = { equipmentId: null, startData: null, currentSize: null };
     setResizingEquipment(null);
-    setResizeStartData(null);
-    
+
     // Remove event listeners
     document.removeEventListener('mousemove', resizeFunctionsRef.current.handleResizeMove);
     document.removeEventListener('mouseup', resizeFunctionsRef.current.handleResizeEnd);
@@ -485,55 +475,54 @@ function EquipmentLayoutPage() {
   const handleResizeStart = (e, equipmentId) => {
     e.stopPropagation();
     e.preventDefault();
-    
-    const equipmentLayout = layout.find(item => item.equipment_id === equipmentId);
+
+    const equipmentLayout = layout.find((item) => item.equipment_id === equipmentId);
     if (!equipmentLayout) {
       return;
     }
-    
+
     const startData = {
       startX: e.clientX,
       startY: e.clientY,
       startWidth: equipmentLayout.width,
-      startHeight: equipmentLayout.height
+      startHeight: equipmentLayout.height,
     };
-    
+
     // Set both state and ref immediately
     setResizingEquipment(equipmentId);
-    setResizeStartData(startData);
-    resizeDataRef.current = { 
-      equipmentId, 
+    resizeDataRef.current = {
+      equipmentId,
       startData,
-      currentSize: { width: equipmentLayout.width, height: equipmentLayout.height }
+      currentSize: { width: equipmentLayout.width, height: equipmentLayout.height },
     };
-    
+
     // Add event listeners for mouse move and up
     document.addEventListener('mousemove', resizeFunctionsRef.current.handleResizeMove);
     document.addEventListener('mouseup', resizeFunctionsRef.current.handleResizeEnd);
   };
 
   const getEquipmentPosition = (equipmentId) => {
-    const equipmentLayout = layout.find(item => item.equipment_id === equipmentId);
-    
+    const equipmentLayout = layout.find((item) => item.equipment_id === equipmentId);
+
     if (equipmentLayout) {
       return {
         left: `${equipmentLayout.x_position}px`,
         top: `${equipmentLayout.y_position}px`,
         width: `${equipmentLayout.width}px`,
-        height: `${equipmentLayout.height}px`
+        height: `${equipmentLayout.height}px`,
       };
     }
-    
+
     return null;
   };
 
   const getEquipmentDetails = (equipmentId) => {
-    return equipment.find(item => item.id === equipmentId);
+    return equipment.find((item) => item.id === equipmentId);
   };
 
   // Get equipment that has a position in the layout
   const positionedEquipment = layout
-    .map(layoutItem => {
+    .map((layoutItem) => {
       const equipmentItem = getEquipmentDetails(layoutItem.equipment_id);
       return equipmentItem ? { ...equipmentItem, layout: layoutItem } : null;
     })
@@ -541,7 +530,7 @@ function EquipmentLayoutPage() {
 
   // Get equipment that doesn't have a position yet
   const unpositionedEquipment = equipment.filter(
-    item => !layout.some(layoutItem => layoutItem.equipment_id === item.id)
+    (item) => !layout.some((layoutItem) => layoutItem.equipment_id === item.id),
   );
 
   return (
@@ -550,19 +539,19 @@ function EquipmentLayoutPage() {
         <div className="card-header">
           <h2 className="card-title">{translate('Equipment Layout')}</h2>
           <div>
-            <button 
+            <button
               onClick={toggleEditMode}
-              style={{ 
+              style={{
                 backgroundColor: editMode ? '#6c757d' : '#007bff',
-                marginRight: '10px'
+                marginRight: '10px',
               }}
             >
               {editMode ? translate('Cancel') : translate('Edit Layout')}
             </button>
-            
+
             {editMode && (
               <>
-                <button 
+                <button
                   onClick={saveLayout}
                   style={{ backgroundColor: '#28a745', marginRight: '10px' }}
                 >
@@ -575,7 +564,7 @@ function EquipmentLayoutPage() {
             )}
           </div>
         </div>
-        
+
         {/* Page Tabs */}
         <div className="page-tabs" style={{
           borderBottom: '1px solid #dee2e6',
@@ -583,9 +572,9 @@ function EquipmentLayoutPage() {
           display: 'flex',
           alignItems: 'center',
           gap: '10px',
-          padding: '10px 0'
+          padding: '10px 0',
         }}>
-          {layoutPages.map(page => (
+          {layoutPages.map((page) => (
             <div key={page.id} style={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
               <button
                 onClick={() => handlePageChange(page.id)}
@@ -598,7 +587,7 @@ function EquipmentLayoutPage() {
                   cursor: 'pointer',
                   fontSize: '14px',
                   marginRight: page.id !== 1 ? '20px' : '5px',
-                  position: 'relative'
+                  position: 'relative',
                 }}
               >
                 {page.name}
@@ -624,7 +613,7 @@ function EquipmentLayoutPage() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    zIndex: 10
+                    zIndex: 10,
                   }}
                   onMouseEnter={(e) => {
                     e.target.style.backgroundColor = '#c82333';
@@ -648,25 +637,27 @@ function EquipmentLayoutPage() {
               borderRadius: '4px',
               cursor: 'pointer',
               fontSize: '14px',
-              marginLeft: '10px'
+              marginLeft: '10px',
             }}
           >
-            + {translate('New Page')}
+            +
+            {' '}
+            {translate('New Page')}
           </button>
         </div>
-        
+
         {error && (
-          <div className="alert" style={{ 
-            backgroundColor: '#f8d7da', 
-            color: '#721c24', 
-            padding: '10px', 
-            borderRadius: '4px', 
-            marginBottom: '20px' 
+          <div className="alert" style={{
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            padding: '10px',
+            borderRadius: '4px',
+            marginBottom: '20px',
           }}>
             {error}
           </div>
         )}
-        
+
         {loading ? (
           <p>Loading equipment layout...</p>
         ) : (
@@ -681,7 +672,7 @@ function EquipmentLayoutPage() {
                 padding: '15px',
                 height: 'fit-content',
                 maxHeight: '600px',
-                overflowY: 'auto'
+                overflowY: 'auto',
               }}>
                 <h4 style={{ margin: '0 0 10px 0', fontSize: '16px', color: '#495057' }}>
                   {translate('Equipment Palette')}
@@ -690,12 +681,12 @@ function EquipmentLayoutPage() {
                   {translate('Drag items to the layout')}
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {unpositionedEquipment.map(item => (
+                  {unpositionedEquipment.map((item) => (
                     <div
                       key={item.id}
                       className="equipment-item"
-                      style={{ 
-                        width: '100%', 
+                      style={{
+                        width: '100%',
                         height: '60px',
                         backgroundColor: '#ffffff',
                         border: '1px solid #dee2e6',
@@ -706,7 +697,7 @@ function EquipmentLayoutPage() {
                         cursor: 'grab',
                         fontSize: '14px',
                         textAlign: 'center',
-                        padding: '8px'
+                        padding: '8px',
                       }}
                       draggable
                       onDragStart={(e) => handleDragStart(e, item.id)}
@@ -717,42 +708,42 @@ function EquipmentLayoutPage() {
                 </div>
               </div>
             )}
-            
+
             {/* Main layout area */}
-            <div 
+            <div
               ref={layoutContainerRef}
               className="layout-container"
               onDragOver={handleDragOver}
               onDrop={handleDrop}
               onDoubleClick={handleLayoutDoubleClick}
-              style={{ 
-                position: 'relative', 
+              style={{
+                position: 'relative',
                 minHeight: '600px',
                 flex: 1,
                 border: '1px solid #dee2e6',
                 borderRadius: '8px',
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
               }}
             >
-            {/* Equipment items */}
-            {positionedEquipment.map(item => (
-              <div
-                key={item.id}
-                className={`equipment-item ${item.in_use ? 'in-use' : ''}`}
-                style={{
-                  position: 'absolute',
-                  ...getEquipmentPosition(item.id),
-                  cursor: editMode ? 'move' : 'pointer'
-                }}
-                onClick={() => handleEquipmentClick(item)}
-                draggable={editMode && !resizingEquipment}
-                onDragStart={(e) => handleDragStart(e, item.id)}
+              {/* Equipment items */}
+              {positionedEquipment.map((item) => (
+                <div
+                  key={item.id}
+                  className={`equipment-item ${item.in_use ? 'in-use' : ''}`}
+                  style={{
+                    position: 'absolute',
+                    ...getEquipmentPosition(item.id),
+                    cursor: editMode ? 'move' : 'pointer',
+                  }}
+                  onClick={() => handleEquipmentClick(item)}
+                  draggable={editMode && !resizingEquipment}
+                  onDragStart={(e) => handleDragStart(e, item.id)}
               >
-                <div className="equipment-name">{item.name}</div>
-                {item.current_user && (
+                  <div className="equipment-name">{item.name}</div>
+                  {item.current_user && (
                   <div className="user-name">{item.current_user}</div>
-                )}
-                {editMode && (
+                  )}
+                  {editMode && (
                   <>
                     <div className="equipment-controls" style={{ marginTop: '4px', display: 'flex', justifyContent: 'center' }}>
                       <button
@@ -777,38 +768,38 @@ function EquipmentLayoutPage() {
                         backgroundColor: '#007bff',
                         cursor: 'se-resize',
                         borderRadius: '0 0 4px 0',
-                        border: '1px solid #0056b3'
+                        border: '1px solid #0056b3',
                       }}
                       draggable={false}
                       onMouseDown={(e) => handleResizeStart(e, item.id)}
                     />
                   </>
-                )}
-              </div>
-            ))}
-            
-            {/* Text labels */}
-            {textLabels.map(label => (
-              <div
-                key={label.id}
-                className="text-label"
-                style={{
-                  position: 'absolute',
-                  left: `${label.x_position}px`,
-                  top: `${label.y_position}px`,
-                  fontSize: `${label.font_size}px`,
-                  cursor: editMode ? 'move' : 'default',
-                  backgroundColor: editMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
-                  padding: editMode ? '4px' : '0',
-                  borderRadius: '4px',
-                  userSelect: 'none'
-                }}
-                onClick={(e) => handleTextLabelClick(e, label)}
-                draggable={editMode}
-                onDragStart={(e) => handleTextLabelDragStart(e, label.id)}
+                  )}
+                </div>
+              ))}
+
+              {/* Text labels */}
+              {textLabels.map((label) => (
+                <div
+                  key={label.id}
+                  className="text-label"
+                  style={{
+                    position: 'absolute',
+                    left: `${label.x_position}px`,
+                    top: `${label.y_position}px`,
+                    fontSize: `${label.font_size}px`,
+                    cursor: editMode ? 'move' : 'default',
+                    backgroundColor: editMode ? 'rgba(255, 255, 255, 0.7)' : 'transparent',
+                    padding: editMode ? '4px' : '0',
+                    borderRadius: '4px',
+                    userSelect: 'none',
+                  }}
+                  onClick={(e) => handleTextLabelClick(e, label)}
+                  draggable={editMode}
+                  onDragStart={(e) => handleTextLabelDragStart(e, label.id)}
               >
-                {label.content}
-                {editMode && (
+                  {label.content}
+                  {editMode && (
                   <div className="text-label-controls" style={{ marginTop: '4px', display: 'flex', gap: '4px' }}>
                     <button
                       onClick={(e) => {
@@ -829,12 +820,12 @@ function EquipmentLayoutPage() {
                       {translate('Delete Text')}
                     </button>
                   </div>
-                )}
-              </div>
-            ))}
-            
-            {/* Text input dialog */}
-            {showTextInput && (
+                  )}
+                </div>
+              ))}
+
+              {/* Text input dialog */}
+              {showTextInput && (
               <div
                 className="text-input-dialog"
                 style={{
@@ -845,7 +836,7 @@ function EquipmentLayoutPage() {
                   padding: '10px',
                   borderRadius: '4px',
                   boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
-                  zIndex: 100
+                  zIndex: 100,
                 }}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -880,26 +871,26 @@ function EquipmentLayoutPage() {
                   </div>
                 </form>
               </div>
-            )}
+              )}
             </div>
           </div>
         )}
       </div>
-      
+
       {showReservationWindow && selectedEquipment && (
         <>
-          <div className="overlay" onClick={handleCloseReservation}></div>
-          <ReservationWindow 
+          <div className="overlay" onClick={handleCloseReservation} />
+          <ReservationWindow
             equipment={selectedEquipment}
             onClose={handleCloseReservation}
           />
         </>
       )}
-      
+
       {/* New Page Dialog */}
       {showNewPageDialog && (
         <>
-          <div className="overlay" onClick={() => setShowNewPageDialog(false)}></div>
+          <div className="overlay" onClick={() => setShowNewPageDialog(false)} />
           <div className="dialog" style={{
             position: 'fixed',
             top: '50%',
@@ -910,7 +901,7 @@ function EquipmentLayoutPage() {
             borderRadius: '8px',
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
             zIndex: 1000,
-            minWidth: '300px'
+            minWidth: '300px',
           }}>
             <h3 style={{ marginTop: 0 }}>{translate('Create New Page')}</h3>
             <div style={{ marginBottom: '15px' }}>
@@ -924,37 +915,37 @@ function EquipmentLayoutPage() {
                 onChange={(e) => setNewPageName(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleNewPage()}
                 autoFocus
-                style={{ 
-                  width: '100%', 
-                  padding: '8px', 
+                style={{
+                  width: '100%',
+                  padding: '8px',
                   border: '1px solid #dee2e6',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
                 }}
               />
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
               <button
                 onClick={() => setShowNewPageDialog(false)}
-                style={{ 
+                style={{
                   padding: '8px 16px',
                   border: '1px solid #6c757d',
                   backgroundColor: '#6c757d',
                   color: 'white',
                   borderRadius: '4px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 {translate('Cancel')}
               </button>
               <button
                 onClick={handleNewPage}
-                style={{ 
+                style={{
                   padding: '8px 16px',
                   border: '1px solid #28a745',
                   backgroundColor: '#28a745',
                   color: 'white',
                   borderRadius: '4px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 {translate('Create')}

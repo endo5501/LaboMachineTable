@@ -7,25 +7,28 @@ jest.mock('../../utils/auth');
 jest.mock('../../utils/db');
 
 describe('Auth Middleware', () => {
-  let req, res, next;
+  let req; let res; let
+    next;
 
   beforeEach(() => {
     req = {
       headers: {},
-      user: null
+      user: null,
     };
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      json: jest.fn(),
     };
     next = jest.fn();
     jest.clearAllMocks();
   });
 
   test('should authenticate valid token', async () => {
-    const mockUser = { id: 1, username: 'testuser', name: 'Test User', email: 'test@example.com' };
+    const mockUser = {
+      id: 1, username: 'testuser', name: 'Test User', email: 'test@example.com',
+    };
     const mockDecoded = { userId: 1 };
-    
+
     getTokenFromRequest.mockReturnValue('valid-token');
     verifyToken.mockReturnValue(mockDecoded);
     get.mockResolvedValue(mockUser);
@@ -65,7 +68,7 @@ describe('Auth Middleware', () => {
 
   test('should reject request when user not found', async () => {
     const mockDecoded = { userId: 999 };
-    
+
     getTokenFromRequest.mockReturnValue('valid-token');
     verifyToken.mockReturnValue(mockDecoded);
     get.mockResolvedValue(null);
@@ -79,7 +82,7 @@ describe('Auth Middleware', () => {
 
   test('should handle database errors', async () => {
     const mockDecoded = { userId: 1 };
-    
+
     getTokenFromRequest.mockReturnValue('valid-token');
     verifyToken.mockReturnValue(mockDecoded);
     get.mockRejectedValue(new Error('Database error'));

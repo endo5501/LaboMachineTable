@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useMemo, useCallback } from 'react';
 import axios from '../utils/axiosConfig';
 import translate from '../utils/translate';
 
@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
     // Check if user is already logged in
     const token = localStorage.getItem('token');
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
       fetchCurrentUser();
     } else {
       setLoading(false);
@@ -35,38 +35,38 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const login = async (username, password) => {
+  const login = useCallback(async (username, password) => {
     try {
       setError('');
-      
+
       const response = await axios.post('/api/auth/login', { username, password });
       const { token, user } = response.data;
-      
+
       localStorage.setItem('token', token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
+      axios.defaults.headers.common.Authorization = `Bearer ${token}`;
+
       setCurrentUser(user);
       return user;
     } catch (err) {
       setError(translate(err.response?.data?.message || 'Failed to login'));
       throw err;
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
+    delete axios.defaults.headers.common.Authorization;
     setCurrentUser(null);
-  };
+  }, []);
 
-  const value = {
+  const value = useMemo(() => ({
     currentUser,
     login,
     logout,
     error,
     setError,
     isAuthenticated: !!currentUser,
-  };
+  }), [currentUser, login, logout, error]);
 
   return (
     <AuthContext.Provider value={value}>

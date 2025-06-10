@@ -18,7 +18,7 @@ describe('Auth Utils', () => {
     test('should hash password with salt rounds', async () => {
       const password = 'testpassword';
       const hashedPassword = 'hashed-password';
-      
+
       bcrypt.hash.mockResolvedValue(hashedPassword);
 
       const result = await hashPassword(password);
@@ -30,7 +30,7 @@ describe('Auth Utils', () => {
     test('should throw error if hashing fails', async () => {
       const password = 'testpassword';
       const error = new Error('Hashing failed');
-      
+
       bcrypt.hash.mockRejectedValue(error);
 
       await expect(hashPassword(password)).rejects.toThrow('Hashing failed');
@@ -41,7 +41,7 @@ describe('Auth Utils', () => {
     test('should return true for matching passwords', async () => {
       const password = 'testpassword';
       const hashedPassword = 'hashed-password';
-      
+
       bcrypt.compare.mockResolvedValue(true);
 
       const result = await comparePassword(password, hashedPassword);
@@ -53,7 +53,7 @@ describe('Auth Utils', () => {
     test('should return false for non-matching passwords', async () => {
       const password = 'testpassword';
       const hashedPassword = 'hashed-password';
-      
+
       bcrypt.compare.mockResolvedValue(false);
 
       const result = await comparePassword(password, hashedPassword);
@@ -66,7 +66,7 @@ describe('Auth Utils', () => {
       const password = 'testpassword';
       const hashedPassword = 'hashed-password';
       const error = new Error('Comparison failed');
-      
+
       bcrypt.compare.mockRejectedValue(error);
 
       await expect(comparePassword(password, hashedPassword)).rejects.toThrow('Comparison failed');
@@ -77,7 +77,7 @@ describe('Auth Utils', () => {
     test('should generate JWT token with user data', () => {
       const user = { id: 1, username: 'testuser' };
       const token = 'generated-token';
-      
+
       jwt.sign.mockReturnValue(token);
 
       const result = generateToken(user);
@@ -85,7 +85,7 @@ describe('Auth Utils', () => {
       expect(jwt.sign).toHaveBeenCalledWith(
         user,
         'test-secret-key',
-        { expiresIn: '24h' }
+        { expiresIn: '24h' },
       );
       expect(result).toBe(token);
     });
@@ -100,17 +100,17 @@ describe('Auth Utils', () => {
           throw new Error('JWT_SECRET environment variable is required');
         }
       }).not.toThrow();
-      
+
       // Test the error case by temporarily removing JWT_SECRET
       const originalJWT = process.env.JWT_SECRET;
       delete process.env.JWT_SECRET;
-      
+
       expect(() => {
         if (!process.env.JWT_SECRET) {
           throw new Error('JWT_SECRET environment variable is required');
         }
       }).toThrow('JWT_SECRET environment variable is required');
-      
+
       // Restore for other tests
       process.env.JWT_SECRET = originalJWT;
     });
@@ -118,7 +118,7 @@ describe('Auth Utils', () => {
     test('should throw error if token generation fails', () => {
       const user = { id: 1, username: 'testuser' };
       const error = new Error('Token generation failed');
-      
+
       jwt.sign.mockImplementation(() => {
         throw error;
       });

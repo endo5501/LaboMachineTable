@@ -13,43 +13,43 @@ const router = express.Router();
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    
+
     if (!username || !password) {
       return res.status(400).json({ message: 'Username and password are required' });
     }
-    
+
     // Check if user exists
     let user = await get('SELECT * FROM users WHERE username = ?', [username]);
-    
+
     if (user) {
       // User exists, verify password
       const isMatch = await comparePassword(password, user.password);
-      
+
       if (!isMatch) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
     } else {
       // Check if auto-registration is enabled
       const autoRegisterEnabled = process.env.ENABLE_AUTO_REGISTRATION === 'true';
-      
+
       if (!autoRegisterEnabled) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
-      
+
       // User doesn't exist, create new user (only if auto-registration is enabled)
       const hashedPassword = await hashPassword(password);
-      
+
       const result = await run(
         'INSERT INTO users (username, password) VALUES (?, ?)',
-        [username, hashedPassword]
+        [username, hashedPassword],
       );
-      
+
       user = await get('SELECT * FROM users WHERE id = ?', [result.id]);
     }
-    
+
     // Generate JWT token
     const token = generateToken({ userId: user.id });
-    
+
     // Return user info and token
     res.json({
       token,
@@ -57,8 +57,8 @@ router.post('/login', async (req, res) => {
         id: user.id,
         username: user.username,
         name: user.name,
-        email: user.email
-      }
+        email: user.email,
+      },
     });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });

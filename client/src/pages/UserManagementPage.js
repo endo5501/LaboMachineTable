@@ -11,7 +11,7 @@ function UserManagementPage() {
     username: '',
     password: '',
     name: '',
-    email: ''
+    email: '',
   });
   const [editingId, setEditingId] = useState(null);
   const { currentUser } = useAuth();
@@ -37,13 +37,13 @@ function UserManagementPage() {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingId) {
         // If editing, only send password if it's been changed
@@ -55,7 +55,7 @@ function UserManagementPage() {
       } else {
         await axios.post('/api/users', formData);
       }
-      
+
       // Reset form and refresh users list
       setFormData({ username: '', password: '', name: '', email: '' });
       setEditingId(null);
@@ -70,7 +70,7 @@ function UserManagementPage() {
       username: user.username,
       password: '', // Don't populate password for security
       name: user.name || '',
-      email: user.email || ''
+      email: user.email || '',
     });
     setEditingId(user.id);
   };
@@ -78,14 +78,14 @@ function UserManagementPage() {
   const handleDelete = async (id) => {
     // Prevent deleting yourself
     if (id === currentUser.id) {
-      setError(translate("You cannot delete your own account."));
+      setError(translate('You cannot delete your own account.'));
       return;
     }
-    
+
     if (!window.confirm(translate('Are you sure you want to delete this user?'))) {
       return;
     }
-    
+
     try {
       await axios.delete(`/api/users/${id}`);
       fetchUsers();
@@ -105,19 +105,19 @@ function UserManagementPage() {
         <div className="card-header">
           <h2 className="card-title">{translate('User Management')}</h2>
         </div>
-        
+
         {error && (
-          <div className="alert" style={{ 
-            backgroundColor: '#f8d7da', 
-            color: '#721c24', 
-            padding: '10px', 
-            borderRadius: '4px', 
-            marginBottom: '20px' 
+          <div className="alert" style={{
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            padding: '10px',
+            borderRadius: '4px',
+            marginBottom: '20px',
           }}>
             {error}
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="username">{translate('Username')}</label>
@@ -131,10 +131,12 @@ function UserManagementPage() {
               disabled={editingId !== null} // Can't change username when editing
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="password">
-              {translate('Password')} {editingId && `(${translate('Leave blank to keep current password')})`}
+              {translate('Password')}
+              {' '}
+              {editingId && `(${translate('Leave blank to keep current password')})`}
             </label>
             <input
               type="password"
@@ -145,7 +147,7 @@ function UserManagementPage() {
               required={!editingId} // Only required for new users
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="name">{translate('Name')}</label>
             <input
@@ -156,7 +158,7 @@ function UserManagementPage() {
               onChange={handleInputChange}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="email">{translate('Email')}</label>
             <input
@@ -167,15 +169,15 @@ function UserManagementPage() {
               onChange={handleInputChange}
             />
           </div>
-          
+
           <div style={{ display: 'flex', gap: '10px' }}>
             <button type="submit">
               {editingId ? translate('Update User') : translate('Add User')}
             </button>
-            
+
             {editingId && (
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={handleCancel}
                 style={{ backgroundColor: '#6c757d' }}
               >
@@ -185,12 +187,12 @@ function UserManagementPage() {
           </div>
         </form>
       </div>
-      
+
       <div className="card">
         <div className="card-header">
           <h3 className="card-title">{translate('User List')}</h3>
         </div>
-        
+
         {loading ? (
           <p>{translate('Loading users...')}</p>
         ) : (
@@ -219,20 +221,20 @@ function UserManagementPage() {
                       <td>{user.email}</td>
                       <td>
                         <div style={{ display: 'flex', gap: '5px' }}>
-                          <button 
+                          <button
                             onClick={() => handleEdit(user)}
-                            style={{ 
+                            style={{
                               backgroundColor: '#28a745',
-                              padding: '0.25rem 0.5rem'
+                              padding: '0.25rem 0.5rem',
                             }}
                           >
                             {translate('Edit')}
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDelete(user.id)}
-                            style={{ 
+                            style={{
                               backgroundColor: '#dc3545',
-                              padding: '0.25rem 0.5rem'
+                              padding: '0.25rem 0.5rem',
                             }}
                             disabled={user.id === currentUser?.id}
                           >

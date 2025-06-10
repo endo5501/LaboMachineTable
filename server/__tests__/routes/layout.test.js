@@ -8,7 +8,7 @@ jest.mock('../../middleware/auth', () => ({
   authenticate: (req, res, next) => {
     req.user = { id: 1, username: 'testuser' };
     next();
-  }
+  },
 }));
 
 const app = express();
@@ -23,8 +23,12 @@ describe('Layout Routes', () => {
   describe('GET /api/layout', () => {
     test('should return all layout data', async () => {
       const mockLayout = [
-        { id: 1, equipment_id: 1, x_position: 100, y_position: 200, width: 150, height: 100 },
-        { id: 2, equipment_id: 2, x_position: 300, y_position: 400, width: 150, height: 100 }
+        {
+          id: 1, equipment_id: 1, x_position: 100, y_position: 200, width: 150, height: 100,
+        },
+        {
+          id: 2, equipment_id: 2, x_position: 300, y_position: 400, width: 150, height: 100,
+        },
       ];
 
       all.mockResolvedValue(mockLayout);
@@ -55,7 +59,7 @@ describe('Layout Routes', () => {
         x_position: 100,
         y_position: 200,
         width: 150,
-        height: 100
+        height: 100,
       };
 
       get.mockResolvedValue(mockLayout);
@@ -67,7 +71,7 @@ describe('Layout Routes', () => {
       expect(response.body).toEqual(mockLayout);
       expect(get).toHaveBeenCalledWith(
         'SELECT * FROM layout WHERE equipment_id = ?',
-        ['1']
+        ['1'],
       );
     });
 
@@ -84,8 +88,10 @@ describe('Layout Routes', () => {
   describe('POST /api/layout', () => {
     test('should create new layouts successfully', async () => {
       const layoutData = [
-        { equipment_id: 1, x_position: 100, y_position: 200, width: 150, height: 100 },
-        { equipment_id: 2, x_position: 300, y_position: 400 }
+        {
+          equipment_id: 1, x_position: 100, y_position: 200, width: 150, height: 100,
+        },
+        { equipment_id: 2, x_position: 300, y_position: 400 },
       ];
 
       get.mockResolvedValueOnce({ id: 1 }); // Equipment 1 exists
@@ -108,7 +114,7 @@ describe('Layout Routes', () => {
         y_position: 200,
         width: 150,
         height: 100,
-        created: true
+        created: true,
       });
       expect(response.body[1]).toMatchObject({
         equipment_id: 2,
@@ -116,13 +122,13 @@ describe('Layout Routes', () => {
         y_position: 400,
         width: 150,
         height: 100,
-        created: true
+        created: true,
       });
     });
 
     test('should update existing layouts', async () => {
       const layoutData = [
-        { equipment_id: 1, x_position: 150, y_position: 250 }
+        { equipment_id: 1, x_position: 150, y_position: 250 },
       ];
 
       const existingLayout = { id: 1 };
@@ -140,7 +146,7 @@ describe('Layout Routes', () => {
         equipment_id: 1,
         x_position: 150,
         y_position: 250,
-        updated: true
+        updated: true,
       });
     });
 
@@ -154,7 +160,7 @@ describe('Layout Routes', () => {
 
     test('should return 400 for missing required fields', async () => {
       const layoutData = [
-        { equipment_id: 1, x_position: 100 } // Missing y_position
+        { equipment_id: 1, x_position: 100 }, // Missing y_position
       ];
 
       await request(app)
@@ -166,7 +172,7 @@ describe('Layout Routes', () => {
 
     test('should return 404 for non-existent equipment', async () => {
       const layoutData = [
-        { equipment_id: 999, x_position: 100, y_position: 200 }
+        { equipment_id: 999, x_position: 100, y_position: 200 },
       ];
 
       get.mockResolvedValue(null); // Equipment doesn't exist
@@ -185,7 +191,7 @@ describe('Layout Routes', () => {
         x_position: 150,
         y_position: 250,
         width: 200,
-        height: 150
+        height: 150,
       };
 
       const updatedLayout = {
@@ -194,7 +200,7 @@ describe('Layout Routes', () => {
         x_position: 150,
         y_position: 250,
         width: 200,
-        height: 150
+        height: 150,
       };
 
       get.mockResolvedValueOnce({ id: 1 }); // Equipment exists
@@ -213,7 +219,7 @@ describe('Layout Routes', () => {
     test('should create new layout if none exists', async () => {
       const updateData = {
         x_position: 100,
-        y_position: 200
+        y_position: 200,
       };
 
       const newLayout = {
@@ -222,7 +228,7 @@ describe('Layout Routes', () => {
         x_position: 100,
         y_position: 200,
         width: 150,
-        height: 100
+        height: 100,
       };
 
       get.mockResolvedValueOnce({ id: 1 }); // Equipment exists
@@ -284,8 +290,12 @@ describe('Layout Routes', () => {
     describe('GET /api/layout/labels', () => {
       test('should return all text labels', async () => {
         const mockLabels = [
-          { id: 1, content: 'Label 1', x_position: 100, y_position: 200, font_size: 16 },
-          { id: 2, content: 'Label 2', x_position: 300, y_position: 400, font_size: 18 }
+          {
+            id: 1, content: 'Label 1', x_position: 100, y_position: 200, font_size: 16,
+          },
+          {
+            id: 2, content: 'Label 2', x_position: 300, y_position: 400, font_size: 18,
+          },
         ];
 
         all.mockResolvedValue(mockLabels);
@@ -306,7 +316,7 @@ describe('Layout Routes', () => {
           content: 'Test Label',
           x_position: 100,
           y_position: 200,
-          font_size: 16
+          font_size: 16,
         };
 
         get.mockResolvedValue(mockLabel);
@@ -335,12 +345,12 @@ describe('Layout Routes', () => {
           content: 'New Label',
           x_position: 100,
           y_position: 200,
-          font_size: 18
+          font_size: 18,
         };
 
         const newLabel = {
           id: 1,
-          ...labelData
+          ...labelData,
         };
 
         run.mockResolvedValue({ id: 1 });
@@ -358,13 +368,13 @@ describe('Layout Routes', () => {
         const labelData = {
           content: 'New Label',
           x_position: 100,
-          y_position: 200
+          y_position: 200,
         };
 
         const newLabel = {
           id: 1,
           ...labelData,
-          font_size: 16
+          font_size: 16,
         };
 
         run.mockResolvedValue({ id: 1 });
@@ -377,7 +387,7 @@ describe('Layout Routes', () => {
 
         expect(run).toHaveBeenCalledWith(
           expect.stringContaining('INSERT INTO text_labels'),
-          ['New Label', 100, 200, 16]
+          ['New Label', 100, 200, 16],
         );
       });
 
@@ -395,7 +405,7 @@ describe('Layout Routes', () => {
         const updateData = {
           content: 'Updated Label',
           x_position: 150,
-          font_size: 20
+          font_size: 20,
         };
 
         const updatedLabel = {
@@ -403,7 +413,7 @@ describe('Layout Routes', () => {
           content: 'Updated Label',
           x_position: 150,
           y_position: 200,
-          font_size: 20
+          font_size: 20,
         };
 
         get.mockResolvedValueOnce({ id: 1 }); // Label exists

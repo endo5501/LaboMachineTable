@@ -9,7 +9,7 @@ function EquipmentManagementPage() {
   const [formData, setFormData] = useState({
     name: '',
     type: '',
-    description: ''
+    description: '',
   });
   const [editingId, setEditingId] = useState(null);
 
@@ -34,20 +34,20 @@ function EquipmentManagementPage() {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     try {
       if (editingId) {
         await axios.put(`/api/equipment/${editingId}`, formData);
       } else {
         await axios.post('/api/equipment', formData);
       }
-      
+
       // Reset form and refresh equipment list
       setFormData({ name: '', type: '', description: '' });
       setEditingId(null);
@@ -61,7 +61,7 @@ function EquipmentManagementPage() {
     setFormData({
       name: item.name,
       type: item.type || '',
-      description: item.description || ''
+      description: item.description || '',
     });
     setEditingId(item.id);
   };
@@ -70,7 +70,7 @@ function EquipmentManagementPage() {
     if (!window.confirm(translate('Are you sure you want to delete this equipment?'))) {
       return;
     }
-    
+
     try {
       await axios.delete(`/api/equipment/${id}`);
       fetchEquipment();
@@ -90,19 +90,19 @@ function EquipmentManagementPage() {
         <div className="card-header">
           <h2 className="card-title">{translate('Equipment Management')}</h2>
         </div>
-        
+
         {error && (
-          <div className="alert" style={{ 
-            backgroundColor: '#f8d7da', 
-            color: '#721c24', 
-            padding: '10px', 
-            borderRadius: '4px', 
-            marginBottom: '20px' 
+          <div className="alert" style={{
+            backgroundColor: '#f8d7da',
+            color: '#721c24',
+            padding: '10px',
+            borderRadius: '4px',
+            marginBottom: '20px',
           }}>
             {error}
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="name">{translate('Equipment Name')}</label>
@@ -115,7 +115,7 @@ function EquipmentManagementPage() {
               required
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="type">{translate('Type')}</label>
             <input
@@ -126,7 +126,7 @@ function EquipmentManagementPage() {
               onChange={handleInputChange}
             />
           </div>
-          
+
           <div className="form-group">
             <label htmlFor="description">{translate('Description')}</label>
             <textarea
@@ -137,15 +137,15 @@ function EquipmentManagementPage() {
               rows="3"
             />
           </div>
-          
+
           <div style={{ display: 'flex', gap: '10px' }}>
             <button type="submit">
               {editingId ? translate('Update Equipment') : translate('Add Equipment')}
             </button>
-            
+
             {editingId && (
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={handleCancel}
                 style={{ backgroundColor: '#6c757d' }}
               >
@@ -155,12 +155,12 @@ function EquipmentManagementPage() {
           </div>
         </form>
       </div>
-      
+
       <div className="card">
         <div className="card-header">
           <h3 className="card-title">{translate('Equipment List')}</h3>
         </div>
-        
+
         {loading ? (
           <p>{translate('Loading...')}</p>
         ) : (
@@ -189,20 +189,20 @@ function EquipmentManagementPage() {
                       <td>{item.description}</td>
                       <td>
                         <div style={{ display: 'flex', gap: '5px' }}>
-                          <button 
+                          <button
                             onClick={() => handleEdit(item)}
-                            style={{ 
+                            style={{
                               backgroundColor: '#28a745',
-                              padding: '0.25rem 0.5rem'
+                              padding: '0.25rem 0.5rem',
                             }}
                           >
                             {translate('Edit')}
                           </button>
-                          <button 
+                          <button
                             onClick={() => handleDelete(item.id)}
-                            style={{ 
+                            style={{
                               backgroundColor: '#dc3545',
-                              padding: '0.25rem 0.5rem'
+                              padding: '0.25rem 0.5rem',
                             }}
                           >
                             {translate('Delete')}

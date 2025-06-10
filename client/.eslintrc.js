@@ -1,0 +1,68 @@
+module.exports = {
+  env: {
+    browser: true,
+    es2021: true,
+    jest: true,
+  },
+  extends: [
+    'react-app',
+    'react-app/jest',
+    'airbnb',
+  ],
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+  },
+  plugins: [
+    'react',
+    'jsx-a11y',
+    'import',
+  ],
+  rules: {
+    'react/react-in-jsx-scope': 'off',
+    'react/jsx-uses-react': 'off',
+    'react/prop-types': 'warn',
+    'react/jsx-props-no-spreading': 'off',
+    'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }],
+    'react/jsx-wrap-multilines': 'off',
+    'react/jsx-first-prop-new-line': 'off',
+    'react/jsx-max-props-per-line': 'off',
+    'react/jsx-closing-bracket-location': 'off',
+    'react/button-has-type': 'warn',
+    'import/prefer-default-export': 'off',
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+    'no-console': 'warn',
+    'no-unused-vars': ['error', { 
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^(React|useCallback|useMemo)$'  // Allow unused React hooks
+    }],
+    'jsx-a11y/click-events-have-key-events': 'warn',
+    'jsx-a11y/no-static-element-interactions': 'warn',
+    'jsx-a11y/no-noninteractive-element-interactions': 'warn',
+    'jsx-a11y/label-has-associated-control': 'warn',
+    'jsx-a11y/control-has-associated-label': 'warn',
+    'object-curly-newline': 'off',
+    'arrow-body-style': 'off',
+    'quote-props': 'off',
+    'no-dupe-keys': 'error',
+    'no-trailing-spaces': 'error',
+    'eol-last': 'error',
+    'comma-dangle': ['error', 'always-multiline'],
+    'no-param-reassign': ['error', { props: false }],
+    'no-shadow': 'warn',
+    'no-use-before-define': 'warn',
+    'no-nested-ternary': 'warn',
+    'no-alert': 'warn',
+    'func-names': 'warn',
+    'max-len': ['warn', { code: 120 }],
+    'jsx-a11y/no-autofocus': 'warn',
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
+};

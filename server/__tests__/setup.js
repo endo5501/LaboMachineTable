@@ -11,8 +11,8 @@ const originalError = console.error;
 beforeAll(() => {
   console.error = (...args) => {
     if (
-      typeof args[0] === 'string' &&
-      args[0].includes('Warning:')
+      typeof args[0] === 'string'
+      && args[0].includes('Warning:')
     ) {
       return;
     }

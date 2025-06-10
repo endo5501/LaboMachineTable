@@ -11,21 +11,21 @@ jest.mock('../../utils/translate', () => ({
 // Mock axios
 jest.mock('../../utils/axiosConfig', () => ({
   get: jest.fn(() => Promise.resolve({ data: [] })),
-  post: jest.fn(() => Promise.resolve({ data: {} }))
+  post: jest.fn(() => Promise.resolve({ data: {} })),
 }));
 
 // Mock AuthContext
 jest.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({
-    currentUser: { id: 1, username: 'testuser' }
-  })
+    currentUser: { id: 1, username: 'testuser' },
+  }),
 }));
 
 const mockEquipment = {
   id: 1,
   name: 'Test Equipment',
   type: 'Instrument',
-  description: 'Test description'
+  description: 'Test description',
 };
 
 describe('ReservationWindow Component', () => {
@@ -37,7 +37,7 @@ describe('ReservationWindow Component', () => {
 
   test('renders reservation window with equipment name', () => {
     render(
-      <ReservationWindow equipment={mockEquipment} onClose={mockOnClose} />
+      <ReservationWindow equipment={mockEquipment} onClose={mockOnClose} />,
     );
 
     expect(screen.getByText('Reserve Test Equipment')).toBeInTheDocument();
@@ -46,7 +46,7 @@ describe('ReservationWindow Component', () => {
 
   test('calls onClose when close button is clicked', () => {
     render(
-      <ReservationWindow equipment={mockEquipment} onClose={mockOnClose} />
+      <ReservationWindow equipment={mockEquipment} onClose={mockOnClose} />,
     );
 
     const closeButton = screen.getByText('×');

@@ -10,7 +10,7 @@ jest.mock('../../middleware/auth', () => ({
   authenticate: (req, res, next) => {
     req.user = { id: 1, username: 'testuser' };
     next();
-  }
+  },
 }));
 
 const app = express();
@@ -25,8 +25,12 @@ describe('Users Routes', () => {
   describe('GET /api/users', () => {
     test('should return all users without passwords', async () => {
       const mockUsers = [
-        { id: 1, username: 'user1', name: 'User One', email: 'user1@test.com' },
-        { id: 2, username: 'user2', name: 'User Two', email: 'user2@test.com' }
+        {
+          id: 1, username: 'user1', name: 'User One', email: 'user1@test.com',
+        },
+        {
+          id: 2, username: 'user2', name: 'User Two', email: 'user2@test.com',
+        },
       ];
 
       all.mockResolvedValue(mockUsers);
@@ -55,7 +59,7 @@ describe('Users Routes', () => {
         id: 1,
         username: 'testuser',
         name: 'Test User',
-        email: 'test@test.com'
+        email: 'test@test.com',
       };
 
       get.mockResolvedValue(mockUser);
@@ -67,7 +71,7 @@ describe('Users Routes', () => {
       expect(response.body).toEqual(mockUser);
       expect(get).toHaveBeenCalledWith(
         'SELECT id, username, name, email FROM users WHERE id = ?',
-        ['1']
+        ['1'],
       );
     });
 
@@ -87,14 +91,14 @@ describe('Users Routes', () => {
         username: 'newuser',
         password: 'password123',
         name: 'New User',
-        email: 'new@test.com'
+        email: 'new@test.com',
       };
 
       const mockCreatedUser = {
         id: 2,
         username: 'newuser',
         name: 'New User',
-        email: 'new@test.com'
+        email: 'new@test.com',
       };
 
       get.mockResolvedValueOnce(null); // No existing user
@@ -111,7 +115,7 @@ describe('Users Routes', () => {
       expect(hashPassword).toHaveBeenCalledWith('password123');
       expect(run).toHaveBeenCalledWith(
         'INSERT INTO users (username, password, name, email) VALUES (?, ?, ?, ?)',
-        ['newuser', 'hashed_password', 'New User', 'new@test.com']
+        ['newuser', 'hashed_password', 'New User', 'new@test.com'],
       );
     });
 
@@ -126,7 +130,7 @@ describe('Users Routes', () => {
     test('should return 400 for existing username', async () => {
       const userData = {
         username: 'existinguser',
-        password: 'password123'
+        password: 'password123',
       };
 
       get.mockResolvedValue({ id: 1 }); // Existing user
@@ -141,14 +145,14 @@ describe('Users Routes', () => {
     test('should handle null name and email', async () => {
       const userData = {
         username: 'newuser',
-        password: 'password123'
+        password: 'password123',
       };
 
       const mockCreatedUser = {
         id: 2,
         username: 'newuser',
         name: null,
-        email: null
+        email: null,
       };
 
       get.mockResolvedValueOnce(null);
@@ -164,7 +168,7 @@ describe('Users Routes', () => {
       expect(response.body).toEqual(mockCreatedUser);
       expect(run).toHaveBeenCalledWith(
         'INSERT INTO users (username, password, name, email) VALUES (?, ?, ?, ?)',
-        ['newuser', 'hashed_password', null, null]
+        ['newuser', 'hashed_password', null, null],
       );
     });
   });
@@ -173,14 +177,14 @@ describe('Users Routes', () => {
     test('should update user successfully', async () => {
       const updateData = {
         username: 'updateduser',
-        name: 'Updated Name'
+        name: 'Updated Name',
       };
 
       const mockUpdatedUser = {
         id: 1,
         username: 'updateduser',
         name: 'Updated Name',
-        email: 'test@test.com'
+        email: 'test@test.com',
       };
 
       get.mockResolvedValueOnce({ id: 1 }); // User exists

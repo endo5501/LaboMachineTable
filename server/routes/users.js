@@ -32,13 +32,13 @@ router.get('/:id', async (req, res) => {
   try {
     const user = await get(
       'SELECT id, username, name, email FROM users WHERE id = ?',
-      [req.params.id]
+      [req.params.id],
     );
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
+
     res.json(user);
   } catch (err) {
     console.error('Get user error:', err);
@@ -53,34 +53,36 @@ router.get('/:id', async (req, res) => {
  */
 router.post('/', async (req, res) => {
   try {
-    const { username, password, name, email } = req.body;
-    
+    const {
+      username, password, name, email,
+    } = req.body;
+
     if (!username || !password) {
       return res.status(400).json({ message: 'Username and password are required' });
     }
-    
+
     // Check if username already exists
     const existingUser = await get('SELECT id FROM users WHERE username = ?', [username]);
-    
+
     if (existingUser) {
       return res.status(400).json({ message: 'Username already exists' });
     }
-    
+
     // Hash password
     const hashedPassword = await hashPassword(password);
-    
+
     // Create user
     const result = await run(
       'INSERT INTO users (username, password, name, email) VALUES (?, ?, ?, ?)',
-      [username, hashedPassword, name || null, email || null]
+      [username, hashedPassword, name || null, email || null],
     );
-    
+
     // Get created user
     const user = await get(
       'SELECT id, username, name, email FROM users WHERE id = ?',
-      [result.id]
+      [result.id],
     );
-    
+
     res.status(201).json(user);
   } catch (err) {
     console.error('Create user error:', err);
@@ -95,69 +97,71 @@ router.post('/', async (req, res) => {
  */
 router.put('/:id', async (req, res) => {
   try {
-    const { username, password, name, email } = req.body;
-    
+    const {
+      username, password, name, email,
+    } = req.body;
+
     // Check if user exists
     const user = await get('SELECT id FROM users WHERE id = ?', [req.params.id]);
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
+
     // If username is provided, check if it's already taken by another user
     if (username) {
       const existingUser = await get(
         'SELECT id FROM users WHERE username = ? AND id != ?',
-        [username, req.params.id]
+        [username, req.params.id],
       );
-      
+
       if (existingUser) {
         return res.status(400).json({ message: 'Username already exists' });
       }
     }
-    
+
     // Build update query
     let updateQuery = 'UPDATE users SET ';
     const updateParams = [];
     const updateFields = [];
-    
+
     if (username) {
       updateFields.push('username = ?');
       updateParams.push(username);
     }
-    
+
     if (password) {
       updateFields.push('password = ?');
       updateParams.push(await hashPassword(password));
     }
-    
+
     if (name !== undefined) {
       updateFields.push('name = ?');
       updateParams.push(name || null);
     }
-    
+
     if (email !== undefined) {
       updateFields.push('email = ?');
       updateParams.push(email || null);
     }
-    
+
     if (updateFields.length === 0) {
       return res.status(400).json({ message: 'No fields to update' });
     }
-    
+
     updateQuery += updateFields.join(', ');
     updateQuery += ', updated_at = CURRENT_TIMESTAMP WHERE id = ?';
     updateParams.push(req.params.id);
-    
+
     // Update user
     await run(updateQuery, updateParams);
-    
+
     // Get updated user
     const updatedUser = await get(
       'SELECT id, username, name, email FROM users WHERE id = ?',
-      [req.params.id]
+      [req.params.id],
     );
-    
+
     res.json(updatedUser);
   } catch (err) {
     console.error('Update user error:', err);
@@ -174,19 +178,19 @@ router.delete('/:id', async (req, res) => {
   try {
     // Check if user exists
     const user = await get('SELECT id FROM users WHERE id = ?', [req.params.id]);
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
+
     // Prevent deleting yourself
     if (parseInt(req.params.id) === req.user.id) {
       return res.status(400).json({ message: 'Cannot delete your own account' });
     }
-    
+
     // Delete user
     await run('DELETE FROM users WHERE id = ?', [req.params.id]);
-    
+
     res.json({ message: 'User deleted' });
   } catch (err) {
     console.error('Delete user error:', err);

@@ -9,7 +9,7 @@ jest.mock('../../middleware/auth', () => ({
   authenticate: (req, res, next) => {
     req.user = { id: 1, username: 'testuser' };
     next();
-  }
+  },
 }));
 
 const app = express();
@@ -24,8 +24,12 @@ describe('Equipment Routes', () => {
   describe('GET /api/equipment', () => {
     test('should return all equipment', async () => {
       const mockEquipment = [
-        { id: 1, name: 'Equipment 1', type: 'Type A', description: 'Description 1', active: 1 },
-        { id: 2, name: 'Equipment 2', type: 'Type B', description: 'Description 2', active: 1 }
+        {
+          id: 1, name: 'Equipment 1', type: 'Type A', description: 'Description 1', active: 1,
+        },
+        {
+          id: 2, name: 'Equipment 2', type: 'Type B', description: 'Description 2', active: 1,
+        },
       ];
 
       all.mockResolvedValue(mockEquipment);
@@ -54,7 +58,7 @@ describe('Equipment Routes', () => {
         name: 'Equipment 1',
         type: 'Type A',
         description: 'Description 1',
-        active: 1
+        active: 1,
       };
 
       get.mockResolvedValue(mockEquipment);
@@ -81,14 +85,14 @@ describe('Equipment Routes', () => {
       const newEquipment = {
         name: 'New Equipment',
         type: 'New Type',
-        description: 'New Description'
+        description: 'New Description',
       };
 
       const mockResult = { id: 3 };
       const mockCreatedEquipment = {
         id: 3,
         ...newEquipment,
-        active: 1
+        active: 1,
       };
 
       run.mockResolvedValue(mockResult);
@@ -102,7 +106,7 @@ describe('Equipment Routes', () => {
       expect(response.body).toEqual(mockCreatedEquipment);
       expect(run).toHaveBeenCalledWith(
         'INSERT INTO equipment (name, type, description, active) VALUES (?, ?, ?, ?)',
-        ['New Equipment', 'New Type', 'New Description', 1]
+        ['New Equipment', 'New Type', 'New Description', 1],
       );
     });
 
@@ -110,7 +114,7 @@ describe('Equipment Routes', () => {
       const response = await request(app)
         .post('/api/equipment')
         .send({
-          type: 'New Type'
+          type: 'New Type',
           // missing name
         });
 
@@ -124,13 +128,13 @@ describe('Equipment Routes', () => {
       const updateData = {
         name: 'Updated Equipment',
         type: 'Updated Type',
-        description: 'Updated Description'
+        description: 'Updated Description',
       };
 
       const mockUpdatedEquipment = {
         id: 1,
         ...updateData,
-        active: 1
+        active: 1,
       };
 
       get.mockResolvedValueOnce({ id: 1 }); // Equipment exists
@@ -145,7 +149,7 @@ describe('Equipment Routes', () => {
       expect(response.body).toEqual(mockUpdatedEquipment);
       expect(run).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE equipment SET'),
-        expect.arrayContaining(['Updated Equipment', 'Updated Type', 'Updated Description', '1'])
+        expect.arrayContaining(['Updated Equipment', 'Updated Type', 'Updated Description', '1']),
       );
     });
 
@@ -155,7 +159,7 @@ describe('Equipment Routes', () => {
       const response = await request(app)
         .put('/api/equipment/999')
         .send({
-          name: 'Updated Equipment'
+          name: 'Updated Equipment',
         });
 
       expect(response.status).toBe(404);
@@ -174,7 +178,7 @@ describe('Equipment Routes', () => {
       expect(response.body.message).toBe('Equipment deleted');
       expect(run).toHaveBeenCalledWith(
         'DELETE FROM equipment WHERE id = ?',
-        ['1']
+        ['1'],
       );
     });
 

@@ -7,7 +7,7 @@ const translations = {
   'Equipment Management': '装置管理',
   'User Management': 'ユーザ管理',
   'Logout': 'ログアウト',
-  
+
   // Login Page
   'Login to LaboMachineTable': 'LaboMachineTableにログイン',
   'Username': 'ユーザ名',
@@ -17,9 +17,8 @@ const translations = {
   'New users will be automatically registered upon first login.': '新規ユーザは初回ログイン時に自動的に登録されます。',
   'Username and password are required': 'ユーザ名とパスワードを入力してください',
   'Failed to login': 'ログインに失敗しました',
-  
+
   // Equipment Management Page
-  'Equipment Management': '装置管理',
   'Equipment Name': '装置名',
   'Type': '種類',
   'Description': '説明',
@@ -27,9 +26,8 @@ const translations = {
   'Edit': '編集',
   'Delete': '削除',
   'Equipment List': '装置一覧',
-  
+
   // User Management Page
-  'User Management': 'ユーザ管理',
   'Name': '名前',
   'Email': 'メールアドレス',
   'Add User': 'ユーザを追加',
@@ -44,9 +42,8 @@ const translations = {
   'Leave blank to keep current password': '現在のパスワードを維持する場合は空白のままにしてください',
   'No users found. Add some users above.': 'ユーザが見つかりません。上記でユーザを追加してください。',
   'Actions': '操作',
-  
+
   // Equipment Layout Page
-  'Equipment Layout': '装置の配置',
   'Edit Layout': 'レイアウトを編集',
   'Save Layout': 'レイアウトを保存',
   'Cancel': 'キャンセル',
@@ -69,7 +66,7 @@ const translations = {
   'Cannot delete the default page': 'デフォルトページは削除できません',
   'Are you sure you want to delete this page? All layouts and labels on this page will be permanently deleted.': 'このページを削除してもよろしいですか？このページの全ての配置図とラベルが完全に削除されます。',
   'Failed to delete page. Please try again.': 'ページの削除に失敗しました。もう一度お試しください。',
-  
+
   // Reservation Status Page
   'Reservation Status': '予約状況',
   'Time': '時間',
@@ -80,18 +77,17 @@ const translations = {
   'Reserved by:': '予約者:',
   'Refresh': '更新',
   'Click on equipment name or time slot to make a reservation.': '装置名または時間帯をクリックして予約を行なってください。',
-  
+
   // Reservation Window
   'Reserve': '予約：',
   'Reserve Equipment': '装置を予約',
   'Select Time Slots': '時間帯を選択',
   'OK': '確定',
-  'Cancel': 'キャンセル',
   'Please select at least one time slot.': '少なくとも1つの時間枠を選択してください。',
   'Failed to save reservation. Please try again.': '予約の保存に失敗しました。もう一度お試しください。',
   'Saving...': '保存中...',
   'Confirm Reservation': '予約を確定',
-  
+
   // Error Messages
   'Failed to load equipment. Please try again later.': '装置の読み込みに失敗しました。後でもう一度お試しください。',
   'Failed to save equipment. Please try again.': '装置の保存に失敗しました。もう一度お試しください。',
@@ -108,12 +104,9 @@ const translations = {
   'Failed to save layout. Please try again.': 'レイアウトの保存に失敗しました。もう一度お試しください。',
   'Failed to load existing reservations. Please try again.': '既存の予約の読み込みに失敗しました。もう一度お試しください。',
   'Failed to update equipment size. Please try again.': '装置サイズの更新に失敗しました。もう一度お試しください。',
-  
+
   // Common
   'Save': '保存',
-  'Edit': '編集',
-  'Delete': '削除',
-  'Cancel': 'キャンセル',
   'Confirm': '確認',
   'Success': '成功',
   'Error': 'エラー',

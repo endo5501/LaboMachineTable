@@ -45,9 +45,9 @@ function Navigation() {
           </span>
         </li>
         <li className="nav-item">
-          <button 
-            onClick={handleLogout} 
-            className="nav-link" 
+          <button
+            onClick={handleLogout}
+            className="nav-link"
             style={{ background: 'none', border: 'none', cursor: 'pointer' }}
           >
             {translate('Logout')}

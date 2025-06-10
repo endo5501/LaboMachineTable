@@ -16,17 +16,17 @@ function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!username || !password) {
       setError(translate('Username and password are required'));
       return;
     }
-    
+
     try {
       setLoading(true);
       await login(username, password);
       navigate(from, { replace: true });
-    } catch (error) {
+    } catch (err) {
       setLoading(false);
       // Error is already set in the AuthContext
     }
@@ -35,19 +35,19 @@ function LoginPage() {
   return (
     <div className="auth-container">
       <h2 className="auth-title">{translate('Login to LaboMachineTable')}</h2>
-      
+
       {error && (
-        <div className="alert" style={{ 
-          backgroundColor: '#f8d7da', 
-          color: '#721c24', 
-          padding: '10px', 
-          borderRadius: '4px', 
-          marginBottom: '20px' 
+        <div className="alert" style={{
+          backgroundColor: '#f8d7da',
+          color: '#721c24',
+          padding: '10px',
+          borderRadius: '4px',
+          marginBottom: '20px',
         }}>
           {error}
         </div>
       )}
-      
+
       <form className="auth-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="username">{translate('Username')}</label>
@@ -59,7 +59,7 @@ function LoginPage() {
             disabled={loading}
           />
         </div>
-        
+
         <div className="form-group">
           <label htmlFor="password">{translate('Password')}</label>
           <input
@@ -70,16 +70,16 @@ function LoginPage() {
             disabled={loading}
           />
         </div>
-        
-        <button 
-          type="submit" 
-          className="auth-button" 
+
+        <button
+          type="submit"
+          className="auth-button"
           disabled={loading}
         >
           {loading ? translate('Logging in...') : translate('Login')}
         </button>
       </form>
-      
+
       <p className="mt-3 text-center">
         {translate('New users will be automatically registered upon first login.')}
       </p>

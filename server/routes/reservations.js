@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
       JOIN equipment e ON r.equipment_id = e.id
       ORDER BY r.start_time ASC
     `);
-    
+
     res.json(reservations);
   } catch (err) {
     console.error('Get reservations error:', err);
@@ -49,11 +49,11 @@ router.get('/:id', async (req, res) => {
       JOIN equipment e ON r.equipment_id = e.id
       WHERE r.id = ?
     `, [req.params.id]);
-    
+
     if (!reservation) {
       return res.status(404).json({ message: 'Reservation not found' });
     }
-    
+
     res.json(reservation);
   } catch (err) {
     console.error('Get reservation error:', err);
@@ -77,7 +77,7 @@ router.get('/equipment/:id', async (req, res) => {
       WHERE r.equipment_id = ?
       ORDER BY r.start_time ASC
     `, [req.params.id]);
-    
+
     res.json(reservations);
   } catch (err) {
     console.error('Get equipment reservations error:', err);
@@ -101,7 +101,7 @@ router.get('/user/:id', async (req, res) => {
       WHERE r.user_id = ?
       ORDER BY r.start_time ASC
     `, [req.params.id]);
-    
+
     res.json(reservations);
   } catch (err) {
     console.error('Get user reservations error:', err);
@@ -118,20 +118,20 @@ router.post('/', async (req, res) => {
   try {
     const { equipment_id, start_time, end_time } = req.body;
     const user_id = req.user.id;
-    
+
     if (!equipment_id || !start_time || !end_time) {
-      return res.status(400).json({ 
-        message: 'Equipment ID, start time, and end time are required' 
+      return res.status(400).json({
+        message: 'Equipment ID, start time, and end time are required',
       });
     }
-    
+
     // Check if equipment exists
     const equipment = await get('SELECT id FROM equipment WHERE id = ?', [equipment_id]);
-    
+
     if (!equipment) {
       return res.status(404).json({ message: 'Equipment not found' });
     }
-    
+
     // Check for conflicts
     const conflicts = await all(`
       SELECT id FROM reservations 
@@ -143,22 +143,22 @@ router.post('/', async (req, res) => {
         (start_time >= ? AND end_time <= ?)
       )
     `, [
-      equipment_id, 
+      equipment_id,
       end_time, start_time,
       end_time, start_time,
-      start_time, end_time
+      start_time, end_time,
     ]);
-    
+
     if (conflicts.length > 0) {
       return res.status(409).json({ message: 'Reservation conflicts with existing reservations' });
     }
-    
+
     // Create reservation
     const result = await run(
       'INSERT INTO reservations (equipment_id, user_id, start_time, end_time) VALUES (?, ?, ?, ?)',
-      [equipment_id, user_id, start_time, end_time]
+      [equipment_id, user_id, start_time, end_time],
     );
-    
+
     // Get created reservation
     const reservation = await get(`
       SELECT 
@@ -170,7 +170,7 @@ router.post('/', async (req, res) => {
       JOIN equipment e ON r.equipment_id = e.id
       WHERE r.id = ?
     `, [result.id]);
-    
+
     res.status(201).json(reservation);
   } catch (err) {
     console.error('Create reservation error:', err);
@@ -187,52 +187,52 @@ router.put('/:id', async (req, res) => {
   try {
     const { start_time, end_time, status } = req.body;
     const user_id = req.user.id;
-    
+
     // Check if reservation exists
     const reservation = await get('SELECT * FROM reservations WHERE id = ?', [req.params.id]);
-    
+
     if (!reservation) {
       return res.status(404).json({ message: 'Reservation not found' });
     }
-    
+
     // Check if user owns the reservation or is an admin
     if (reservation.user_id !== user_id) {
       return res.status(403).json({ message: 'Not authorized to update this reservation' });
     }
-    
+
     // Build update query
     let updateQuery = 'UPDATE reservations SET ';
     const updateParams = [];
     const updateFields = [];
-    
+
     if (start_time) {
       updateFields.push('start_time = ?');
       updateParams.push(start_time);
     }
-    
+
     if (end_time) {
       updateFields.push('end_time = ?');
       updateParams.push(end_time);
     }
-    
+
     if (status) {
       updateFields.push('status = ?');
       updateParams.push(status);
     }
-    
+
     if (updateFields.length === 0) {
       return res.status(400).json({ message: 'No fields to update' });
     }
-    
+
     updateQuery += updateFields.join(', ');
     updateQuery += ', updated_at = CURRENT_TIMESTAMP WHERE id = ?';
     updateParams.push(req.params.id);
-    
+
     // If changing times, check for conflicts
     if (start_time || end_time) {
       const newStartTime = start_time || reservation.start_time;
       const newEndTime = end_time || reservation.end_time;
-      
+
       const conflicts = await all(`
         SELECT id FROM reservations 
         WHERE equipment_id = ? 
@@ -248,17 +248,17 @@ router.put('/:id', async (req, res) => {
         reservation.id,
         newEndTime, newStartTime,
         newEndTime, newStartTime,
-        newStartTime, newEndTime
+        newStartTime, newEndTime,
       ]);
-      
+
       if (conflicts.length > 0) {
         return res.status(409).json({ message: 'Reservation conflicts with existing reservations' });
       }
     }
-    
+
     // Update reservation
     await run(updateQuery, updateParams);
-    
+
     // Get updated reservation
     const updatedReservation = await get(`
       SELECT 
@@ -270,7 +270,7 @@ router.put('/:id', async (req, res) => {
       JOIN equipment e ON r.equipment_id = e.id
       WHERE r.id = ?
     `, [req.params.id]);
-    
+
     res.json(updatedReservation);
   } catch (err) {
     console.error('Update reservation error:', err);
@@ -286,22 +286,22 @@ router.put('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
   try {
     const user_id = req.user.id;
-    
+
     // Check if reservation exists
     const reservation = await get('SELECT * FROM reservations WHERE id = ?', [req.params.id]);
-    
+
     if (!reservation) {
       return res.status(404).json({ message: 'Reservation not found' });
     }
-    
+
     // Check if user owns the reservation or is an admin
     if (reservation.user_id !== user_id) {
       return res.status(403).json({ message: 'Not authorized to delete this reservation' });
     }
-    
+
     // Delete reservation
     await run('DELETE FROM reservations WHERE id = ?', [req.params.id]);
-    
+
     res.json({ message: 'Reservation deleted' });
   } catch (err) {
     console.error('Delete reservation error:', err);

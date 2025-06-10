@@ -8,7 +8,7 @@ jest.mock('../../middleware/auth', () => ({
   authenticate: (req, res, next) => {
     req.user = { id: 1, username: 'testuser' };
     next();
-  }
+  },
 }));
 
 const app = express();
@@ -31,8 +31,8 @@ describe('Reservations Routes', () => {
           end_time: '2023-01-01 12:00:00',
           status: 'active',
           user_username: 'testuser',
-          equipment_name: 'Test Equipment'
-        }
+          equipment_name: 'Test Equipment',
+        },
       ];
 
       all.mockResolvedValue(mockReservations);
@@ -65,7 +65,7 @@ describe('Reservations Routes', () => {
         end_time: '2023-01-01 12:00:00',
         status: 'active',
         user_username: 'testuser',
-        equipment_name: 'Test Equipment'
+        equipment_name: 'Test Equipment',
       };
 
       get.mockResolvedValue(mockReservation);
@@ -98,8 +98,8 @@ describe('Reservations Routes', () => {
           start_time: '2023-01-01 10:00:00',
           end_time: '2023-01-01 12:00:00',
           status: 'active',
-          user_username: 'testuser'
-        }
+          user_username: 'testuser',
+        },
       ];
 
       all.mockResolvedValue(mockReservations);
@@ -123,8 +123,8 @@ describe('Reservations Routes', () => {
           start_time: '2023-01-01 10:00:00',
           end_time: '2023-01-01 12:00:00',
           status: 'active',
-          equipment_name: 'Test Equipment'
-        }
+          equipment_name: 'Test Equipment',
+        },
       ];
 
       all.mockResolvedValue(mockReservations);
@@ -143,7 +143,7 @@ describe('Reservations Routes', () => {
       const reservationData = {
         equipment_id: 1,
         start_time: '2023-01-01 10:00:00',
-        end_time: '2023-01-01 12:00:00'
+        end_time: '2023-01-01 12:00:00',
       };
 
       const mockEquipment = { id: 1 };
@@ -153,7 +153,7 @@ describe('Reservations Routes', () => {
         user_id: 1,
         status: 'active',
         user_username: 'testuser',
-        equipment_name: 'Test Equipment'
+        equipment_name: 'Test Equipment',
       };
 
       get.mockResolvedValueOnce(mockEquipment);
@@ -181,7 +181,7 @@ describe('Reservations Routes', () => {
       const reservationData = {
         equipment_id: 999,
         start_time: '2023-01-01 10:00:00',
-        end_time: '2023-01-01 12:00:00'
+        end_time: '2023-01-01 12:00:00',
       };
 
       get.mockResolvedValue(null);
@@ -197,7 +197,7 @@ describe('Reservations Routes', () => {
       const reservationData = {
         equipment_id: 1,
         start_time: '2023-01-01 10:00:00',
-        end_time: '2023-01-01 12:00:00'
+        end_time: '2023-01-01 12:00:00',
       };
 
       const mockEquipment = { id: 1 };
@@ -218,7 +218,7 @@ describe('Reservations Routes', () => {
     test('should update reservation successfully', async () => {
       const updateData = {
         start_time: '2023-01-01 11:00:00',
-        end_time: '2023-01-01 13:00:00'
+        end_time: '2023-01-01 13:00:00',
       };
 
       const mockReservation = {
@@ -227,14 +227,14 @@ describe('Reservations Routes', () => {
         user_id: 1,
         start_time: '2023-01-01 10:00:00',
         end_time: '2023-01-01 12:00:00',
-        status: 'active'
+        status: 'active',
       };
 
       const mockUpdatedReservation = {
         ...mockReservation,
         ...updateData,
         user_username: 'testuser',
-        equipment_name: 'Test Equipment'
+        equipment_name: 'Test Equipment',
       };
 
       get.mockResolvedValueOnce(mockReservation);
@@ -264,7 +264,7 @@ describe('Reservations Routes', () => {
       const mockReservation = {
         id: 1,
         user_id: 2,
-        equipment_id: 1
+        equipment_id: 1,
       };
 
       get.mockResolvedValue(mockReservation);
@@ -280,7 +280,7 @@ describe('Reservations Routes', () => {
       const mockReservation = {
         id: 1,
         user_id: 1,
-        equipment_id: 1
+        equipment_id: 1,
       };
 
       get.mockResolvedValue(mockReservation);
@@ -298,7 +298,7 @@ describe('Reservations Routes', () => {
       const mockReservation = {
         id: 1,
         user_id: 1,
-        equipment_id: 1
+        equipment_id: 1,
       };
 
       get.mockResolvedValue(mockReservation);
@@ -325,7 +325,7 @@ describe('Reservations Routes', () => {
       const mockReservation = {
         id: 1,
         user_id: 2,
-        equipment_id: 1
+        equipment_id: 1,
       };
 
       get.mockResolvedValue(mockReservation);
