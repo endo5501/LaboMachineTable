@@ -38,7 +38,7 @@ describe('Layout Routes', () => {
         .expect(200);
 
       expect(response.body).toEqual(mockLayout);
-      expect(all).toHaveBeenCalledWith('SELECT * FROM layout');
+      expect(all).toHaveBeenCalledWith('SELECT * FROM layout', []);
     });
 
     test('should handle database errors', async () => {
@@ -95,10 +95,12 @@ describe('Layout Routes', () => {
       ];
 
       get.mockResolvedValueOnce({ id: 1 }); // Equipment 1 exists
+      get.mockResolvedValueOnce({ id: 1 }); // Layout page exists
       get.mockResolvedValueOnce(null); // No existing layout for equipment 1
       run.mockResolvedValueOnce({ id: 1 });
 
       get.mockResolvedValueOnce({ id: 2 }); // Equipment 2 exists
+      get.mockResolvedValueOnce({ id: 1 }); // Layout page exists
       get.mockResolvedValueOnce(null); // No existing layout for equipment 2
       run.mockResolvedValueOnce({ id: 2 });
 
@@ -114,6 +116,7 @@ describe('Layout Routes', () => {
         y_position: 200,
         width: 150,
         height: 100,
+        page_id: 1,
         created: true,
       });
       expect(response.body[1]).toMatchObject({
@@ -122,6 +125,7 @@ describe('Layout Routes', () => {
         y_position: 400,
         width: 150,
         height: 100,
+        page_id: 1,
         created: true,
       });
     });
@@ -134,6 +138,7 @@ describe('Layout Routes', () => {
       const existingLayout = { id: 1 };
 
       get.mockResolvedValueOnce({ id: 1 }); // Equipment exists
+      get.mockResolvedValueOnce({ id: 1 }); // Layout page exists
       get.mockResolvedValueOnce(existingLayout); // Existing layout
       run.mockResolvedValue();
 
@@ -146,6 +151,7 @@ describe('Layout Routes', () => {
         equipment_id: 1,
         x_position: 150,
         y_position: 250,
+        page_id: 1,
         updated: true,
       });
     });
@@ -175,7 +181,7 @@ describe('Layout Routes', () => {
         { equipment_id: 999, x_position: 100, y_position: 200 },
       ];
 
-      get.mockResolvedValue(null); // Equipment doesn't exist
+      get.mockResolvedValueOnce(null); // Equipment doesn't exist
 
       await request(app)
         .post('/api/layout')
@@ -204,6 +210,7 @@ describe('Layout Routes', () => {
       };
 
       get.mockResolvedValueOnce({ id: 1 }); // Equipment exists
+      get.mockResolvedValueOnce({ id: 1 }); // Layout page exists
       get.mockResolvedValueOnce({ id: 1 }); // Layout exists
       run.mockResolvedValue();
       get.mockResolvedValueOnce(updatedLayout);
@@ -232,6 +239,7 @@ describe('Layout Routes', () => {
       };
 
       get.mockResolvedValueOnce({ id: 1 }); // Equipment exists
+      get.mockResolvedValueOnce({ id: 1 }); // Layout page exists
       get.mockResolvedValueOnce(null); // No existing layout
       run.mockResolvedValue({ id: 1 });
       get.mockResolvedValueOnce(newLayout);
@@ -305,7 +313,7 @@ describe('Layout Routes', () => {
           .expect(200);
 
         expect(response.body).toEqual(mockLabels);
-        expect(all).toHaveBeenCalledWith('SELECT * FROM text_labels');
+        expect(all).toHaveBeenCalledWith('SELECT * FROM text_labels', []);
       });
     });
 
@@ -353,6 +361,7 @@ describe('Layout Routes', () => {
           ...labelData,
         };
 
+        get.mockResolvedValueOnce({ id: 1 }); // Layout page exists
         run.mockResolvedValue({ id: 1 });
         get.mockResolvedValue(newLabel);
 
@@ -377,6 +386,7 @@ describe('Layout Routes', () => {
           font_size: 16,
         };
 
+        get.mockResolvedValueOnce({ id: 1 }); // Layout page exists
         run.mockResolvedValue({ id: 1 });
         get.mockResolvedValue(newLabel);
 
@@ -387,7 +397,7 @@ describe('Layout Routes', () => {
 
         expect(run).toHaveBeenCalledWith(
           expect.stringContaining('INSERT INTO text_labels'),
-          ['New Label', 100, 200, 16],
+          [1, 'New Label', 100, 200, 16],
         );
       });
 
