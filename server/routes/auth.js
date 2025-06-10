@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
         email: user.email,
       },
     });
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -73,7 +73,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', authenticate, async (req, res) => {
   try {
     res.json(req.user);
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: 'Server error' });
   }
 });

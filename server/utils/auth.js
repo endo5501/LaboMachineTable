@@ -42,7 +42,7 @@ const generateToken = (payload) => jwt.sign(payload, JWT_SECRET, { expiresIn: JW
 const verifyToken = (token) => {
   try {
     return jwt.verify(token, JWT_SECRET);
-  } catch (err) {
+  } catch {
     throw new Error('Invalid token');
   }
 };
