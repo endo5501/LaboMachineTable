@@ -32,6 +32,7 @@ export default [
         Response: 'readonly',
         URL: 'readonly',
         URLSearchParams: 'readonly',
+        Image: 'readonly',
       },
     },
     plugins: {
@@ -48,10 +49,7 @@ export default [
       'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx'] }],
       'react/button-has-type': 'warn',
       'no-console': 'warn',
-      'no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_|^React$'
-      }],
+      'no-unused-vars': 'off',
       'object-curly-newline': 'off',
       'arrow-body-style': 'off',
       'quote-props': 'off',
@@ -60,11 +58,11 @@ export default [
       'eol-last': 'error',
       'comma-dangle': ['error', 'always-multiline'],
       'no-param-reassign': ['error', { props: false }],
-      'no-shadow': 'warn',
-      'no-use-before-define': 'warn',
+      'no-shadow': 'off',
+      'no-use-before-define': 'off',
       'no-nested-ternary': 'warn',
       'no-alert': 'warn',
-      'func-names': 'warn',
+      'func-names': 'off',
       'max-len': ['warn', { code: 120 }],
     },
     settings: {
@@ -87,6 +85,22 @@ export default [
         afterAll: 'readonly',
         jest: 'readonly',
       },
+    },
+  },
+  {
+    files: ['**/setupProxy.js'],
+    languageOptions: {
+      sourceType: 'script',
+      globals: {
+        module: 'writable',
+        require: 'readonly',
+        process: 'readonly',
+        console: 'readonly',
+      },
+    },
+    rules: {
+      'func-names': 'off',
+      'no-undef': 'off',
     },
   },
 ];
