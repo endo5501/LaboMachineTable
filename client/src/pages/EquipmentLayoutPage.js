@@ -142,20 +142,29 @@ function EquipmentLayoutPage() {
 
     setDraggedEquipment(equipmentId);
 
-    // Find the equipment's current position
-    const equipmentLayout = layout.find((item) => item.equipment_id === equipmentId);
-    if (equipmentLayout) {
-      // Calculate offset between mouse position and equipment top-left corner
-      const rect = e.currentTarget.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left;
-      const offsetY = e.clientY - rect.top;
-      setDragOffset({ x: offsetX, y: offsetY });
-    }
+    // Calculate offset between mouse position and equipment top-left corner
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+    setDragOffset({ x: offsetX, y: offsetY });
 
-    // Set transparent drag image
-    const img = new Image();
-    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    e.dataTransfer.setDragImage(img, 0, 0);
+    // Create a custom drag image that looks like the equipment
+    const dragImage = e.currentTarget.cloneNode(true);
+    dragImage.style.opacity = '0.7';
+    dragImage.style.position = 'absolute';
+    dragImage.style.top = '-1000px';
+    dragImage.style.pointerEvents = 'none';
+    document.body.appendChild(dragImage);
+
+    // Set the custom drag image with the calculated offset
+    e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+
+    // Clean up the temporary element after a short delay
+    setTimeout(() => {
+      if (document.body.contains(dragImage)) {
+        document.body.removeChild(dragImage);
+      }
+    }, 0);
   };
 
   const handleDragOver = (e) => {
@@ -268,20 +277,29 @@ function EquipmentLayoutPage() {
 
     setDraggedLabel(labelId);
 
-    // Find the label's current position
-    const label = textLabels.find((item) => item.id === labelId);
-    if (label) {
-      // Calculate offset between mouse position and label top-left corner
-      const rect = e.currentTarget.getBoundingClientRect();
-      const offsetX = e.clientX - rect.left;
-      const offsetY = e.clientY - rect.top;
-      setDragOffset({ x: offsetX, y: offsetY });
-    }
+    // Calculate offset between mouse position and label top-left corner
+    const rect = e.currentTarget.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const offsetY = e.clientY - rect.top;
+    setDragOffset({ x: offsetX, y: offsetY });
 
-    // Set transparent drag image
-    const img = new Image();
-    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    e.dataTransfer.setDragImage(img, 0, 0);
+    // Create a custom drag image that looks like the text label
+    const dragImage = e.currentTarget.cloneNode(true);
+    dragImage.style.opacity = '0.7';
+    dragImage.style.position = 'absolute';
+    dragImage.style.top = '-1000px';
+    dragImage.style.pointerEvents = 'none';
+    document.body.appendChild(dragImage);
+
+    // Set the custom drag image with the calculated offset
+    e.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+
+    // Clean up the temporary element after a short delay
+    setTimeout(() => {
+      if (document.body.contains(dragImage)) {
+        document.body.removeChild(dragImage);
+      }
+    }, 0);
   };
 
   const handleLayoutDoubleClick = (e) => {
